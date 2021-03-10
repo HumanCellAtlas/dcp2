@@ -889,6 +889,8 @@ dcp2).
 Import errors
 -------------
 
+This work is currenly in progress and tracked by DSPDC-1604.
+
 Errors that occur during the importer's processing of the staging area
 for a particular source are logged by the importer to dedicated files in
 the staging area. The object naming scheme for these error log files is
