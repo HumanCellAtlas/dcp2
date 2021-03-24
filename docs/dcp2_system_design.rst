@@ -138,7 +138,7 @@ A TDR dataset is made up of one table per concrete HCA metadata entity
 type. These entity types are defined in JSON schema, one schema per
 type. The JSON schema source code is hosted on Github—each
 ``*.json`` file underneath `this Github folder <metadata entities_>`_
-defines a concrete HCA entity type. [1]_ Each row in a TDR table
+defines a concrete HCA entity type. [#]_ Each row in a TDR table
 represents exactly one HCA entity. A *document* is a metadata entity
 serialized as JSON, using one of the concrete schemas.
 
@@ -148,7 +148,7 @@ serialized as JSON, using one of the concrete schemas.
    JSON string) in the ``content`` column of a row in the TDR
    table for entities of the type defined by that schema.
 
--  The ``…_id`` primary key [2]_ (PK) column (e.g.
+-  The ``…_id`` primary key [#]_ (PK) column (e.g.
    ``cell_suspension_id``) of such a table holds the entity
    ID, a UUID. The entity ID can also be found in the ``content``
    column under the ``provenance.document_id`` document
@@ -166,7 +166,7 @@ serialized as JSON, using one of the concrete schemas.
 
    -  have an additional ``FileRef`` column called
       ``file_id`` containing the DRS URI of the data
-      file, [3]_
+      file, [#]_
 
    -  and a ``descriptor`` column, a variable-length JSON string
       containing the file descriptor JSON with properties for
@@ -187,7 +187,7 @@ freedom to erase all TDR tables, recreate the TDR schema and rerun the
 importers. Post-MVP release, this freedom is greatly restricted and we
 need to rely on schema migration in TDR natively. |ne|
 
-.. [1]
+.. [#]
    Concrete schema types like `sequence_file`_ conceptually inherit an
    abstract schema type by `embedding`_ a core schema like
    `file_core`_.
@@ -196,12 +196,12 @@ need to rely on schema migration in TDR natively. |ne|
 .. _embedding: https://github.com/HumanCellAtlas/metadata-schema/blob/f37da4858d0a31263d2126246e552f45048cb87c/json_schema/type/file/sequence_file.json#L8
 .. _file_core: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/core/file/file_core.json
 
-.. [2]
+.. [#]
    Marking a column as PK in a TDR schema makes the column mandatory. BQ
    does not have a notion of primary keys and TDR only enforces the
    mandate but not uniqueness.
 
-.. [3]
+.. [#]
    Note that this column is different from the ``file_id`` property of
    the JSON value in the ``descriptor`` column
 
@@ -424,7 +424,7 @@ An example file descriptor follows below::
    content addressing for deduplication. The DSS adapter uses the
    bundle UUID (same as ``links_id``) and the
    ``file_name`` property of a file's entry in the bundle
-   manifest to determine the value for ``file_name``. [4]_
+   manifest to determine the value for ``file_name``. [#]_
 
 -  ``file_id`` is a UUID that uniquely identifies each data file
    in the source. The DSS adapter, for example, uses the DSS file
@@ -450,7 +450,7 @@ An example file descriptor follows below::
 -  ``crc32c``, ``sha1``, ``sha256`` and
    ``s3_etag`` are the respective hashes of the content.
    Note that the schema only permits lowercase hexadecimal
-   characters to avoid ambiguity. [5]_ As opposed to the other
+   characters to avoid ambiguity. [#]_ As opposed to the other
    hashes, the S3 ETag does not unambiguously represent a particular
    data file content. There can be many different S3 ETags for the
    same sequence of bytes.
@@ -471,14 +471,14 @@ two. Similarly, instead of allocating a random UUIDv4 for the descriptor
 ``file_id`` one could also derive a UUIDv5 from the SHA-1 or SHA-256
 hashes of the data file's content.
 
-.. [4]
+.. [#]
    If a file is referenced by multiple bundles using different file
    names, the DSS adapter stages multiple objects with the same content.
    This case occurs in the wild, but is of negligible impact (< 1% in
    volume, zarr store members and PDFs documenting experimental
    protocols).
 
-.. [5]
+.. [#]
    many developers erroneously compare the string representation of
    content hashes (and UUIDs for that matter) using a case sensitive
    quality comparison
@@ -489,7 +489,7 @@ Analysis provenance
 In DCP/1, an analysis bundle (a bundle containing output files from an
 analysis workflow) referred to the input bundle (a bundle that contains
 the input files) via the
-`input_bundles`_ property of the ``analysis_process`` entity. [6]_ This was
+`input_bundles`_ property of the ``analysis_process`` entity. [#]_ This was
 problematic in two ways: 1) the bundle version is missing and 2)
 metadata should be agnostic to bundles. The ``analysis_process``
 schema also requires a ``reference_bundle`` property for
@@ -515,7 +515,7 @@ reference files as regular input files to an ``analysis_process`` in the
 
 .. _metadata-schema #1288: https://github.com/HumanCellAtlas/metadata-schema/issues/1288
 
-.. [6]
+.. [#]
    While the schema allows multiple input bundles, the analysis bundles
    in the wild only have one.
 
@@ -659,7 +659,7 @@ Staging area layout
 
 Object names given in this section are relative to the staging area. To
 produce the complete ``gs://…`` URI of a particular object in the
-staging area, append the object's name to the staging area URI. [7]_
+staging area, append the object's name to the staging area URI. [#]_
 
 There are four object naming schemes, one for data files, one for file
 descriptors, one for metadata files and one for ``links.json`` files.
@@ -676,7 +676,7 @@ descriptors, one for metadata files and one for ``links.json`` files.
 
    ``entity_id``
        is a UUID that uniquely identifies the metadata
-       entity. [8]_ The TDR importer uses ``entity_id`` as the
+       entity. [#]_ The TDR importer uses ``entity_id`` as the
        PK for the row in the corresponding BQ table e.g., the
        ``cell_suspension_id`` column of the
        ``cell_suspension`` table.
@@ -740,10 +740,10 @@ descriptors, one for metadata files and one for ``links.json`` files.
        must record an error if it detects more than one object with the
        same ``links/{links_id}_{version}_`` prefix.
 
-.. [7]
+.. [#]
    The staging area URI is guaranteed to end in a slash.
 
-.. [8]
+.. [#]
    The entity ID can also be found in each document under
    ``.provenance.document_id``.
 
@@ -1029,7 +1029,7 @@ by a contributor. The namespace for the v5 UUID is
 the values from the tracking spreadsheet column named
 ``file_source`` e.g. ``contributor``, ``hca release``,
 ``arrayexpress`` and so on. A complete list can
-be found in the `Azul source`_ [9]_.
+be found in the `Azul source`_ [#]_.
 
 .. _Azul source: https://github.com/DataBiosphere/azul/blob/a820e259ba9e37a94b5788a257d4c6f43fe31801/src/azul/plugins/metadata/hca/transform.py#L271
 
@@ -1172,7 +1172,7 @@ for a project with at least one stratified matrix file or::
 
 for a project with one non-stratified matrix.
 
-.. [9]
+.. [#]
    the link points to a specific version, the most recent version of
    that file may have a more up-to-date list
 
