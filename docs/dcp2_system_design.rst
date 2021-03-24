@@ -723,11 +723,10 @@ descriptors, one for metadata files and one for ``links.json`` files.
 
         descriptors/{entity_type}/{entity_id}_{version}.json
 
-   where ``entity_type``, ``entity_id`` and
-   ``version`` have the same meaning as for metadata entities,
-   except that the value of ``entity_type`` has to end in
-   ``_file``. File descriptors are JSON documents and are
-   described in `Generic file metadata`_.
+   where ``entity_type``, ``entity_id`` and ``version`` have the same meaning
+   as for metadata entities, except that the value of ``entity_type`` has to
+   end in ``_file``. File descriptors are JSON documents and are described in
+   `Generic file metadata`_.
 
 -  The object name of a data file is::
 
