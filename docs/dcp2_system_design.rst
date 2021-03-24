@@ -4,6 +4,9 @@
 .. |nn| replace:: :raw-html:`<blockquote>`
 .. |ne| replace:: :raw-html:`</blockquote>`
 
+
+
+
 ===================
 DCP/2 System Design
 ===================
@@ -13,6 +16,9 @@ for informational purposes only and does not bear on the implementation.
 |ne|
 
 .. contents::
+
+
+
 
 Overview
 ========
@@ -52,6 +58,7 @@ in the DCP/2.
 Each component (Ingest, TDR, Azul, Data Browser) maintains at least two
 instances: one for development, testing and integration with other
 components (``dev``) and one for production (``prod``).
+
 
 Datasets, snapshots and catalogs
 --------------------------------
@@ -111,6 +118,9 @@ per project and access control domain, so that projects with a mix of
 public and access-controlled data, or a mix of access control domains
 can be incorporated into the DCP/2. |ne|
 
+
+
+
 Terra Data Repository schema
 ============================
 
@@ -130,6 +140,7 @@ using the BigQuery SQL dialect. This is a very powerful means but comes
 with a relatively steep learning curve. The REST web service exposed by
 Azul, the Data Browser back end is a simpler but less powerful
 alternative that will service most consumers' needs.
+
 
 TDR datasets
 ------------
@@ -205,12 +216,14 @@ need to rely on schema migration in TDR natively. |ne|
    Note that this column is different from the ``file_id`` property of
    the JSON value in the ``descriptor`` column
 
+
 TDR snapshots
 -------------
 
 TDR snapshots follow the same schema except that the value in the
 ``file_id`` column is not null and that the ``…_id``
 primary key column is unique i.e., no two versions of the same entity.
+
 
 Subgraphs in TDR (the links table)
 ----------------------------------
@@ -261,6 +274,7 @@ TDR snapshots contain the same table, but just like entity tables in
 snapshots, only one version of a subgraph may exist and the
 ``links_id`` column is a unique key for all rows in the
 ``links`` table of a snapshot.
+
 
 Subgraph reconstruction
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -330,6 +344,7 @@ that entity) and only one row per ``links_id`` (only one version of that
 subgraph). The reconstruction should fail if multiple versions are
 found.
 
+
 Subgraph stitching
 ~~~~~~~~~~~~~~~~~~
 
@@ -366,6 +381,7 @@ subgraphs) verbatim in its own index and expose them for access via its
 REST API. This would eliminate not only the need for consumers to stitch
 subgraphs, but also the need to learn BigQuery and the TDR schema. |ne|
 
+
 Supplementary files
 -------------------
 
@@ -381,6 +397,7 @@ to ``link.json`` accordingly.
 
 .. _project: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/type/project/project.json
 .. _supplementary_file: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/type/file/supplementary_file.json
+
 
 Generic file metadata
 ---------------------
@@ -483,6 +500,7 @@ hashes of the data file's content.
    content hashes (and UUIDs for that matter) using a case sensitive
    quality comparison
 
+
 Analysis provenance
 -------------------
 
@@ -518,6 +536,7 @@ reference files as regular input files to an ``analysis_process`` in the
 .. [#]
    While the schema allows multiple input bundles, the analysis bundles
    in the wild only have one.
+
 
 Naming datasets and snapshots
 -----------------------------
@@ -611,6 +630,9 @@ Snapshot examples::
     hca_dev_20200812_dssPrimaryOnly___20200813
     hca_dev_20200812_dssPrimaryOnly___20200814_fixedUnicode
 
+
+
+
 Data exchange format
 ====================
 
@@ -653,6 +675,7 @@ for the same project should ever be imported into the same TDR dataset.
 For new DCP/2 datasets wrangled by EBI/UCSC, each project is treated as
 one source and has its own staging area. All staging areas for such
 projects appear in the staging bucket under a common folder.
+
 
 Staging area layout
 -------------------
@@ -747,6 +770,7 @@ descriptors, one for metadata files and one for ``links.json`` files.
    The entity ID can also be found in each document under
    ``.provenance.document_id``.
 
+
 Data file paths
 ---------------
 
@@ -784,6 +808,7 @@ that work around this limitation by using ``!`` instead of ``/``. The DSS
 adapter undoes the substitution. That is the only modification the DSS
 adapter applies to the `file_core.file_name`_ property.
 
+
 Importer idempotence
 --------------------
 
@@ -793,6 +818,7 @@ and the one in TDR/Firestore.
 
 Similarly, the importer must not create a new row in a TDR table if that
 row would be identical to another row except for its ``rowid``.
+
 
 Summary of schema changes
 -------------------------
@@ -828,6 +854,7 @@ release of the DCP/2. The table is for information only. |ne|
 .. _metadata-schema #1285: https://github.com/HumanCellAtlas/metadata-schema/issues/1285
 .. _metadata-schema #1316: https://github.com/HumanCellAtlas/metadata-schema/issues/1316
 
+
 Schema validation
 -----------------
 
@@ -840,6 +867,7 @@ termination of the importer without processing the remaining objects in
 the staging area.
 
 See also `Import errors`_.
+
 
 Invalid documents in the DCP/1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -885,6 +913,7 @@ the affected documents valid, the DCP/2 will maintain the non-production
 instances until the metadata documents are corrected and we stop
 supporting the releases affected by this issue (currently dcp1 and
 dcp2).
+
 
 Import errors
 -------------
@@ -1176,6 +1205,7 @@ for a project with one non-stratified matrix.
    the link points to a specific version, the most recent version of
    that file may have a more up-to-date list
 
+
 DCP/2-generated matrices
 ------------------------
 
@@ -1240,6 +1270,7 @@ property is omitted.
 
    Graphical interpretation of how DCP/2 generated matrices are
    linked to the experimental graph
+
 
 DCP/1-generated matrices
 ------------------------
