@@ -144,8 +144,8 @@ metadata team. Details:
 - Data layout: Staging area exchange format
 - Project UUID: 90bf705c-d891-5ce2-aa54-094488b445c6
 
-Under the specified folder, there will be one folder per project metadata test. Only one test will be maintained,
-with a stable project UUID, but for some releases there may be some extra projects to test specific subgraphs.
+Only one test will be maintained, with a stable project UUID, but for some releases there may be some extra projects
+to test specific subgraphs.
 
 
 .. _design principles: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/rationale.md#design-choices
