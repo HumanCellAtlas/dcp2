@@ -15,15 +15,11 @@ Overview
 
 The HCA metadata standard is developed in a transparent and open manner so that the whole HCA community can participate
 in the process. It follows a set of `design principles`_ that serve as a foundation for the metadata standard in order
-to ensure it meets the needs of HCA data contributors and consumers.
+to ensure it meets the needs of HCA data contributors, consumers and DCP downstream components.
 
-.. _design principles: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/rationale.md#design-choices
-
-The metadata schemas are versioned each following semantic `versioning rules`_ that account for backwards compatibility.
+The metadata schemas are versioned following semantic `versioning rules`_ that account for backwards compatibility.
 However, compatibility of the schemas does not account for impact on the schema consumers, especially if different
 versions of the same schemas must be maintained, indexed, displayed and/or interacted with in any form.
-
-.. _versioning rules: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/evolution.md
 
 The metadata is updated through PRs in the `metadata-schema repository`_. The specific details can be found in the
 documentation in the repository, but the overall flow can be described as follows:
@@ -33,15 +29,14 @@ documentation in the repository, but the overall flow can be described as follow
   against the schema
 - The PR is reviewed within a time frame specified by the type of change (Major/Minor/Patch). The review includes
   all the DCP components and test metadata is generated for each PR.
-- The branch is merged into develop
-- Each week, the update gets one step upwards, until it hits production (``master``) 4 weeks later. At this point,
-  the update is considered released.
+- Once the required metadata team reviewers approve the changes, the branch is merged into staging
+- Once all the metadata changes required for a functional update are merged into staging, a PR will be created from the
+  staging branch into master and test data will be created and linked to the PR. This PR should be reviewed by all
+  DCP downstream components within 2 weeks.
 
-In order to keep the path with the HCA single cell scientific community, the HCA Metadata Schema must remain
+In order to stay relevant to the HCA single cell scientific community, the HCA Metadata Schema must remain
 agile, but the tools to interpret and present the [meta]data to the community must be kept in the loop to provide
 users with a reliable system.
-
-.. _metadata-schema repository: https://github.com/HumanCellAtlas/metadata-schema/
 
 
 High Level Goals
@@ -71,7 +66,7 @@ Metadata producers
 
 Metadata consumers
 ------------------
-- Review the PRs in the timeframe stablished
+- Review the PRs in the established timeframe (2 weeks maximum)
 - Test the metadata updates on their end
 
 
@@ -88,9 +83,6 @@ repository SOPs.
 For a detailed procedure of how PRs are created, please review the `Release SOP`_, subsection ``Steps of the pre-release
 process`` |ne|
 
-.. _evolution document: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/evolution.md
-.. _Release SOP: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/release_process.md
-
 When a metadata consumer creates a ticket in the metadata schema repository, the metadata team is informed and takes
 a look at the requested change. After a discussion, if it's deemed important to the schema, a member of the metadata
 schema will create a PR applying the changes to the desired schemas.
@@ -100,34 +92,32 @@ The affected schemas and its dependencies will all be versioned up, based on the
 
 PR creation and review
 ----------------------
-A member of the metadata team creates a PR with the changes included, targeting the develop branch.
+A member of the metadata team creates a PR with the changes specified in the ticket, targeting the staging branch.
+This branch will be merged after wrangler approval.
 
-Along with the changes, test metadata for that specific update is generated, and it will cover all the possible use
-cases/values when options are limited (e.g. enum fields). **Unless specifically asked to test a use case, ontologised
-fields metadata won't cover every possible use case**.
+These changes will be grouped together by functional groups, determined by the value they add as a whole vs the value
+they add separately, making it so that more than one branch may be merged before trying to release the features.
 
-One person from each of the 5 main DCP components will be tagged as a PR reviewer through random pullapprove pulls. The
-test [meta]data provided in the PR will be tested and each reviewer will approve/request changes on the PR.
+Along with the changes, test metadata for that specific update is generated. This test data is generated in the `test
+data repository`_ and linked in the PR under the section "**Test metadata:**" in the body.
 
-Depending on the type of change, the reviewers will be given a time frame for testing:
+One person from each of the 5 main DCP components will be tagged as a PR reviewer through random pullapprove pulls,
+determined in the `pullapprove config file`_. The test [meta]data provided in the PR will be tested and each reviewer
+will approve/request changes on the PR. The reviewers will also be responsible of pointing if they want changes or
+suggest feedback on the schemas, which will then be discussed and, if deemed necessary, corrected by the metadata team.
 
-- Major change: 5 working days
-- Minor change: 3 working days
-
-Patches do not need to be reviewed by the metadata consumers, as they do not affect instances of the schema.
-
+The PRs from staging to master need to be reviewed within 2 weeks (10 working days). If the PR has not been reviewed by
+the end of the first week, the metadata team will be responsible to ping the missing reviewers. After the 2 weeks, if
+there are missing reviews, it will be understood that the update is accepted and the metadata team will proceed to
+release the updates to production.
 
 
 PR merging and release
 ----------------------
 
-Once approved, the PR will be merged against the develop branch and published in the `schema dev server`_. Each week,
-the previous environment is merged against the next one, making it effectively 4 weeks between when an update is
-released to develop and when it's released to production.
+Once approved, the PR will be merged against the master branch and published in the `schema production server`_.
 
 The detailed release process can be found in the `release SOP`_
-
-.. _schema dev server: https://schema.dev.data.humancellatlas.org/schemas/
 
 
 Major changes and schema inconsistency between projects
@@ -139,19 +129,30 @@ schema is accepted, compatibility between several versions causes a high technic
 For that purpose, the metadata schema team will migrate, before each release, all the projects brokered into the DCP2
 via the EBI ingestion system when there is, at least, 1 major change involved.
 
-Minor and patch changes won't be migrated as they are assumed to be tested through the test metadata and be backwards
-compatible.
+Minor and patch changes won't be migrated as they are assumed to be tested through the test metadata and minor changes
+to the schema are backwards-compatible.
 
 
 Test metadata
 =============
 
-The test metadata will be updated on every PR by the metadata team. Details:
+The test metadata will be updated on every release PR (staging to master in the `metadata-schema repository`_) by the
+metadata team. Details:
 
-- Repository: `metadata-schema repository`_
-- Folder: 'infrastructure_testing_files/DCP2_test_metadata/'
+- Repository: `test data repository`_
+- Folder: 'tests/'
 - Data layout: Staging area exchange format
+- Project UUID: 90bf705c-d891-5ce2-aa54-094488b445c6
 
 Under the specified folder, there will be one folder per project metadata test. Only one test will be maintained,
-with a stable project UUID, but for some releases there will be some extra projects to test specific user stories.
+with a stable project UUID, but for some releases there may be some extra projects to test specific subgraphs.
 
+
+.. _design principles: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/rationale.md#design-choices
+.. _versioning rules: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/evolution.md
+.. _metadata-schema repository: https://github.com/HumanCellAtlas/metadata-schema/
+.. _evolution document: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/evolution.md
+.. _Release SOP: https://github.com/HumanCellAtlas/metadata-schema/blob/master/docs/release_process.md
+.. _schema production server: https://schema.data.humancellatlas.org/schemas/
+.. _test data repository: https://github.com/HumanCellAtlas/schema-test-data
+.. _pullapprove config file: https://github.com/HumanCellAtlas/metadata-schema/blob/master/.pullapprove.yml
