@@ -40,9 +40,13 @@ EBI Ingest (the primary channel for incorporating projects into the DCP/2), an
 adapter for processing analysis (meta)data from Terra workspaces, and adapters
 for high-level matrix data from a range of sources.
 
-All metadata is in JSON format and complies with the HCA Metadata Schema.
-Aside from minor schema changes that were necessary for processing the staging
-areas, the evolution of the schema is currently on hold.
+All metadata is in JSON format and complies with the `HCA Metadata Schema`_.
+Changes to that schema are made according to standard `DCP/2 operating
+procedures`_.
+
+.. _HCA Metadata Schema: https://github.com/HumanCellAtlas/metadata-schema
+
+.. _DCP/2 operating procedures: dcp2_operating_procedures.rst
 
 The DCP/2 only contains public (meta)data (not controlled access).
 
