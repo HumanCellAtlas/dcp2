@@ -115,9 +115,9 @@ the following steps:
     by the DCP, move on to the next step. As part of the review, the Azul team
     updates their unit tests to validate the updated test metadata. If a test
     fails, they either improve the test or the team member reviewing the PR
-    requests the necessarty changes to the test metadata.
+    requests the necessary changes to the test metadata.
 
-9)  Prepare a PR against the schema repository, targetting the main branch.
+9)  Prepare a PR against the schema repository, targeting the master branch.
 
 10) Initiate a `Pull request review`_ of your PR. The review should be quick
     because reviewers will already have seen the changes while reviewing the PR
@@ -142,11 +142,11 @@ accompanied by a matching change to the test metadata in the `schema-test-data`_
 repository. Both changes must be done as PRs following the `Pull request
 review`_  process. 
 
-The test metadata should excercise all graph shapes in actual use. 
+The test metadata should exercise all graph shapes in actual use.
 
 The schema references (``describedBy``) in all metadata documents in the main
 branch of `schema-test-data`_ repository must match the schemas on the
-`master` branch of the `metadata-schema`_ repository. Pull requests against the 
+`master` branch of the `metadata-schema`_ repository.
 
 
 Pull request review
