@@ -165,8 +165,12 @@ As a PR author
     channel on Slack, @-mentioning requested reviewers that haven't yet
     reviewed the PR.
 
-5)  If two weeks have passed since step 1 and there are no binding reviews
-    requesting changes, the PR has been approved by the DCP.
+5)  The PR is considered *approved by the DCP** if either
+
+    a)  all reviewers approve of the PR or
+
+    b)  two weeks have passed since step 1 and there are no binding reviews
+        requesting changes.
 
 6)  Otherwise, if this is a PR against the `metadata-schema`_ or
     `schema-test-data`_ repositories and a reviewer requests that you first
@@ -198,7 +202,8 @@ As a PR reviewer
     delegation.
 
 3)  Review the PR in good faith. Ask specific questions or make specific
-    suggestions.
+    suggestions. If you can't find anything objectionable in the PR, approve the
+    PR as soon as possible. Don't get lost in details.
 
 4)  If you accept the PR author's response to a comment made by the reviewer,
     mark the comment thread as resolved on Github.
