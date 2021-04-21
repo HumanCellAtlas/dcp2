@@ -243,13 +243,13 @@ PR author invites the `Mediators`_ and all reviewers currently on the PR.
 Designated reviewers
 ~~~~~~~~~~~~~~~~~~~~
 
-- Claire (EBI)
-- Marion (EBI)
-- Ruchi (Broad)
-- Kylee (Broad)
-- Andrew (Broad)
-- Hannes (UCSC)
-- Dave (UCSC)
+- Claire aka ``@clairerye`` (EBI)
+- Amnon aka ``@amnonkhen`` (EBI)
+- Ruchi aka ``@ruchim`` (Broad)
+- Kylee aka ``@kbergin`` (Broad)
+- Andrew aka ``@aherbst-broad`` (Broad)
+- Hannes aka ``@hannes-ucsc`` (UCSC)
+- Dave aka ``@NoopDog`` (UCSC)
 
 
 Mediators
