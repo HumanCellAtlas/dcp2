@@ -882,7 +882,8 @@ revised and the Ingest component was modified to add those fields to
 documents but the schema reference in those documents still points at an
 old schema, not the revised one. This is further complicated by the fact
 that the ``provenance`` schema is referenced indirectly via the
-main document schema (`example document`_).
+main document schema (`example document`_, link now broken since DSS is EOL).
+
 The ``analysis_file`` schema in that document is at version
 6.0.0 while the new fields were introduced in version 6.2.0 (via the
 ``provenance`` schema version 1.1.0). The problem affects all
