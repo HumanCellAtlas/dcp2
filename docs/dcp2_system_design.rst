@@ -359,7 +359,7 @@ metadata entities in the subgraph that contains the input sequence
 files. Without this, the analysis files wouldn't be discoverable in the
 Data Browser by, say, the species, a property of the
 ``donor_organism`` entity, or the assay, a property of the
-``library_construction_protocol`` entity.
+``library_preparation_protocol`` entity.
 
 Azul looks for dangling edges in an analysis subgraph, that is, entities
 that occur as an input to an analysis process but that are not contained
@@ -990,6 +990,22 @@ Broad Institute).
 Project-level matrices
 ======================
 
+In the context of the HCA DCP, a matrix is a two-dimensional structure relating
+individual cell identities (or an approximation thereof) to properties of the
+the transcriptome of those cells e.g., genes expressed in the transcriptome,
+number of those cells.
+
+A *project-level* matrix is a matrix that covers all or a large subset of the
+cells involved in the experiments for a particular project. A project-level
+matrix is *stratified* if it is partitioned over separate files, using certain
+criteria on the properties of the experiments in a project or the cells studied
+in those experiments.
+
+A matrix from a contributor or any other source external to the DCP is refered
+to as a *contributor-generated* matrix. This definition includes supporting
+files such as those containing cell type annotations, for example, that
+contributors may provide along with the actual matrices.
+
 
 Contributor-generated matrices (CGMs)
 -------------------------------------
@@ -1001,10 +1017,19 @@ direct download in the Data Browser. The artifacts (data, metadata, user
 interface elements) involved in this interim solution will be replaced with
 those produced by a longer-lived and more informationally rich solution, one
 that is mostly hinged upon devising an adequate metadata schema by which to
-describe these matrices. Reproducibility of analysis that uses the interim
-artefacts will be provided via TDR snapshots. The MVP snapshot will
-permanently expose the interim artifacts, while a later release snapshot will
-expose the permanent replacements.
+describe these matrices.
+
+The (now deprecated) interim and the permanent solution are defined in the
+sections below.
+
+Describing CGMs as supplementary files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+|nn| The mechanism described in this section is deprecated and should not be
+used. The the DCP/2 MVP release, also known as ``dcp2``, and subsequent releases
+``dcp3`` and ``dcp4`` use this mechanism to describe CGMs. The solution that
+replaces this deprecated mechanism is defined `Describing CGMs as analysis
+files`_ |nn|
 
 For DCP/2 MVP, no post-processing is performed on contributor-generated
 matrices. Users will be able to download them in exactly the same file format
@@ -1198,6 +1223,82 @@ for a project with one non-stratified matrix.
 .. [#]
    the link points to a specific version, the most recent version of
    that file may have a more up-to-date list
+
+
+Describing CGMs as analysis files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The mechanism defined in `Describing CGMs as supplementary files`_ is
+deprecated. Instead of representing a contributor-generated matrix (CGM) as a
+stand-alone supplementary file, it is described more accurately as an
+``analysis_file`` entity that is an output of a ``process`` entity.
+
+Information about the provenance of the CGMs for a particular project may be
+limited. The DCP/2 may not be in possession of intermediate artifacts like the
+sequence data or any information about those artifacts because, for example,
+they are subject to access restrictions the DCP/2 does not yet have the
+capabilities to enforce. Even if the DCP/2 is in possession of intermediate
+artifacts and knows their provenance, their bearing on the contributed
+matrices may not have been supplied.
+
+Either way, the subgraph(s) containing CGM analysis files may need to be an
+approximation. If they are, the ``process`` entity that lists one or more CGMs
+as its output will not have any sequence files or other intermediate matrix
+files as inputs — as they would in the case of `DCP/2-generated matrices`_ —
+but instead directly refer to biomaterial entities like
+``specimen_from_organism``, ``cell_line`` or ``organoid`` as its input,
+skipping the sequence files and any intermediate matrices.
+
+Consequently, the Azul indexer extends its definition of *sample* as the nearest
+biomaterial ancestor of a sequence file that is not a cell suspension to also
+include biomaterials linked directly to such an approximate ``process`` entity.
+
+Azul previously defined *sequencing input* as any input biomaterial to a
+process with a sequencing protocol. Usually that is a cell suspension, but it
+could also be liquid specimen like a drop of blood. The previous definition of
+*sequencing input* matches input biomaterials to the approximate CGM
+``process`` entity because that process refers to a ``sequencing_protocol``
+entity. The approximate CGM subgraph is likely to elide any cell
+suspensions and it may not be known if a specimen was used directly as
+sequencing input, either. Azul therefore excludes from the definition of
+``sequencing input`` any inputs to an approximate ``process`` entity.
+
+If information is available about the protocols used in the experiment
+yielding the CGMs, that information is captured in protocol entities such as
+``sequencing_protocol`` or ``library_preparation_protocol`` and those
+protocol entities are linked to the approximate ``process`` entity.
+
+
+The following schemas have been augmented for the purpose of capturing
+information about CGMs.
+
+  - the ``analysis_file`` schema has a ``matrix_cell_count`` property to
+    capture the exact number of cells in the matrix
+
+  - the ``file_core`` schema, and therefore every ``…_file`` schema 
+    that uses it has a ``file_source`` enum property for capturing  the
+    specific source of the file e.g. ``DCP``, ``Contributor``, ``GEO``,
+    ``Publication`` etc. This property serves the same purpose as the
+    ``file_core.provenance.submitter_id`` in ``supplementary_files``
+    describing CGM in the deprecated mechanism (`Describing CGMs as
+    supplementary files`_)
+
+  - the ``analysis_protocol`` contains an optional ``matrix`` module schema
+    containing the properties ``data_normalization_methods`` and 
+    ``derivation_process`` 
+
+Traversing the approximate CGM subgraphs, the Azul indexer infers a
+stratification tree of exactly the same structure as the one it derives from
+the explicit stratification information in the
+``supplementary_file.file_description`` property used by the deprecated
+mechanism (`Describing CGMs as supplementary files`_). The Data Browser
+exposes that tree in the same manner on the project details page. The inferral
+algorithm is identical to the one used for ``DCP/2-generated matrices`` with
+the one distinction that the subgraphs in the latter are exact, not
+approximate. 
+
+Additionally, the CGM analysis files are listed on the Files tab of the Data
+Browser.
 
 
 DCP/2-generated matrices
