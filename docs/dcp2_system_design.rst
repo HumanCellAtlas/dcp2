@@ -1029,7 +1029,7 @@ Describing CGMs as supplementary files
 used. The the DCP/2 MVP release, also known as ``dcp2``, and subsequent releases
 ``dcp3`` and ``dcp4`` use this mechanism to describe CGMs. The solution that
 replaces this deprecated mechanism is defined `Describing CGMs as analysis
-files`_ |nn|
+files`_ |ne|
 
 For DCP/2 MVP, no post-processing is performed on contributor-generated
 matrices. Users will be able to download them in exactly the same file format
