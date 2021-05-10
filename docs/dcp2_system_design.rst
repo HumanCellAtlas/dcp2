@@ -11,9 +11,8 @@
 DCP/2 System Design
 ===================
 
-|nn| Text in a block quote (like this) is not normative. It was included
-for informational purposes only and does not bear on the implementation.
-|ne|
+|nn| Text in a block quote (like this) is not normative. It was included for
+informational purposes only and does not bear on the implementation. |ne|
 
 .. contents::
 
@@ -25,98 +24,91 @@ Overview
 
 The DCP/2 stores all (meta)data in the Terra Data Repository (TDR). The
 metadata is indexed by Azul, the Data Browser back end, so that the Data
-Browser front end can expose it for interactive discovery by end users.
-The Data Browser facilitates the download of metadata (via Azul) and
-data (via Azul and TDR's DRS 1.1 implementation) to end users' systems.
-The Data Browser has a mechanism for handing off (meta)data for analysis
-in Terra.
+Browser front end can expose it for interactive discovery by end users. The
+Data Browser facilitates the download of metadata (via Azul) and data (via
+Azul and TDR's DRS 1.1 implementation) to end users' systems. The Data Browser
+has a mechanism for handing off (meta)data for analysis in Terra.
 
 (Meta)data is imported into the TDR from one or more staging areas whose
-structure is specified in this document. The staging areas are prepared
-by so called *adapters* and imported by an *importer*. There is an
-adapter for (meta)data in DCP/1 (the *DSS adapter*), an adapter for
-primary (meta)data in EBI Ingest (the primary channel for incorporating
-projects into the DCP/2), an adapter for processing analysis (meta)data
-from Terra workspaces, and adapters for high-level matrix data from a
-range of sources.
+structure is specified in this document. The staging areas are prepared by so
+called *adapters* and imported by an *importer*. There is an adapter for
+(meta)data in DCP/1 (the *DSS adapter*), an adapter for primary (meta)data in
+EBI Ingest (the primary channel for incorporating projects into the DCP/2), an
+adapter for processing analysis (meta)data from Terra workspaces, and adapters
+for high-level matrix data from a range of sources.
 
-All metadata is in JSON format and complies with the HCA Metadata
-Schema. Aside from minor schema changes that were necessary for
-processing the staging areas, the evolution of the schema is currently
-on hold.
+All metadata is in JSON format and complies with the HCA Metadata Schema.
+Aside from minor schema changes that were necessary for processing the staging
+areas, the evolution of the schema is currently on hold.
 
 The DCP/2 only contains public (meta)data (not controlled access).
 
-The data in the DCP/2 is organized logically by *project* and physically
-by *dataset*, *snapshot* and *catalog*. The term project was inherited
-from the DCP/1 and it is used to group the (meta)data from a particular
-publication, usually by a single laboratory or consortium of
-laboratories. Outside of the DCP/2 a project is often referred to as a
-*study* or a *dataset* but the latter term has a different connotation
-in the DCP/2.
+The data in the DCP/2 is organized logically by *project* and physically by
+*dataset*, *snapshot* and *catalog*. The term project was inherited from the
+DCP/1 and it is used to group the (meta)data from a particular publication,
+usually by a single laboratory or consortium of laboratories. Outside of the
+DCP/2 a project is often referred to as a *study* or a *dataset* but the
+latter term has a different connotation in the DCP/2.
 
 Each component (Ingest, TDR, Azul, Data Browser) maintains at least two
-instances: one for development, testing and integration with other
-components (``dev``) and one for production (``prod``).
+instances: one for development, testing and integration with other components
+(``dev``) and one for production (``prod``).
 
 
 Datasets, snapshots and catalogs
 --------------------------------
 
-One TDR dataset includes all (meta)data to be released as part of the
-MVP. Other datasets may be created for testing and demonstration. All 29
-of the DCP/1 projects are included in that dataset. So are any other
-projects listed in these two tracker sheets: `Data Ops Tracker`_
-and `Datasets for MVP HCA DCP2`_.
-Multiple snapshots of the datasets may be created but only one snapshot
-is displayed in the Data Browser. The official MVP snapshot must be
+One TDR dataset includes all (meta)data to be released as part of the MVP.
+Other datasets may be created for testing and demonstration. All 29 of the
+DCP/1 projects are included in that dataset. So are any other projects listed
+in these two tracker sheets: `Data Ops Tracker`_ and `Datasets for MVP HCA
+DCP2`_. Multiple snapshots of the datasets may be created but only one
+snapshot is displayed in the Data Browser. The official MVP snapshot must be
 retained but earlier pre-release snapshots can and should be deleted.
 
 .. _Data Ops Tracker: https://www.google.com/url?q=https://docs.google.com/spreadsheets/d/17zoW8zGEp_qnnjKY6KH2CUuX5ubVDE0SkOINMvUw6kI&sa=D&source=editors&ust=1614906832769000&usg=AOvVaw0yT5zSGVe3kIjTYcLyNZk0
+
 .. _Datasets for MVP HCA DCP2: https://www.google.com/url?q=https://docs.google.com/spreadsheets/d/1ot-Xw-EaoCMxUxAVmXIWocx80hhmxa_g3StCEYH3oDo&sa=D&source=editors&ust=1614906832769000&usg=AOvVaw1-vdCuo2XvOy60fO7eB-rl
 
-An instance of the Data Browser backend (Azul) supports multiple
-catalogs. A catalog is a self-contained, independent index of a given
-TDR snapshot. The Data Browser frontend is configured to display the
-contents of a particular catalog by default and includes UI elements
-that allow the user to select a different catalog to be displayed. In
-``prod``, there are two catalogs: ``dcp1`` and ``dcp2``. The ``dcp1``
-catalog contains
+An instance of the Data Browser backend (Azul) supports multiple catalogs. A
+catalog is a self-contained, independent index of a given TDR snapshot. The
+Data Browser frontend is configured to display the contents of a particular
+catalog by default and includes UI elements that allow the user to select a
+different catalog to be displayed. In ``prod``, there are two catalogs:
+``dcp1`` and ``dcp2``. The ``dcp1`` catalog contains
 
--  all (meta)data from the DCP/1 datastore (DSS)
+- all (meta)data from the DCP/1 datastore (DSS)
 
--  project-level matrices generated by the DCP/1 Matrix Service for some
-   projects with 10x experiments
+- project-level matrices generated by the DCP/1 Matrix Service for some
+  projects with 10x experiments
 
 The ``dcp2`` catalog contains work towards the next post-MVP release
 
--  primary (meta)data from the DSS
+- primary (meta)data from the DSS
 
--  primary (meta)data for projects that were wrangled and ingested by
-   EBI/UCSC but had not been placed into the DSS
+- primary (meta)data for projects that were wrangled and ingested by EBI/UCSC
+  but had not been placed into the DSS
 
--  project-level matrices from other sources (also known as
-   contributor-generated matrices), potentially stratified by
-   species, organ, development stage and library construction (10x
-   or SS2)
+- project-level matrices from other sources (also known as
+  contributor-generated matrices), potentially stratified by species, organ,
+  development stage and library construction (10x or SS2)
 
--  a growing corpus of (meta)data produced by reanalysing ("re" as in
-   again, in contrast to the analysis that was done by the DCP/2)
-   the primary data in this catalog
+- a growing corpus of (meta)data produced by reanalysing ("re" as in again,
+  in contrast to the analysis that was done by the DCP/2) the primary data in
+  this catalog
 
--  the matrices produced by that reanalysis, stratified by assay,
-   species, and organ.
+- the matrices produced by that reanalysis, stratified by assay, species, and
+  organ.
 
 |nn| There is experimental support for indexing multiple, non overlapping
-snapshots into a single catalog in the Data Browser. This will allow for
-the creation of one snapshot per project which will allow for faster
-incremental ingestion of primary (meta)data for new projects, faster
-indexing of (re)analysis output and, last but not least, ingestion of
-projects containing access controlled (meta)data. Even further down the
-road, this feature will enable the creation and indexing of a snapshot
-per project and access control domain, so that projects with a mix of
-public and access-controlled data, or a mix of access control domains
-can be incorporated into the DCP/2. |ne|
+snapshots into a single catalog in the Data Browser. This will allow for the
+creation of one snapshot per project which will allow for faster incremental
+ingestion of primary (meta)data for new projects, faster indexing of
+(re)analysis output and, last but not least, ingestion of projects containing
+access controlled (meta)data. Even further down the road, this feature will
+enable the creation and indexing of a snapshot per project and access control
+domain, so that projects with a mix of public and access-controlled data, or a
+mix of access control domains can be incorporated into the DCP/2. |ne|
 
 
 
@@ -124,79 +116,72 @@ can be incorporated into the DCP/2. |ne|
 Terra Data Repository schema
 ============================
 
-For metadata, the Terra Data Repository (TDR) distinguishes between
-datasets and snapshots. While a dataset is the primary storage for
-metadata over multiple versions, snapshots are an immutable subset of a
-dataset containing only some entities and only one version of those
-entities, typically, the latest version at the time the snapshot is
-created. For data files, TDR uses Firestore. Metadata entities that
-describe data files contain a reference to the data file in Firestore.
-|nn| Both datasets and snapshots are currently implemented as Google
-BigQuery datasets. The tables in the BigQuery dataset that backs a TDR
-snapshot are currently views, not physical tables. |ne|
+For metadata, the Terra Data Repository (TDR) distinguishes between datasets
+and snapshots. While a dataset is the primary storage for metadata over
+multiple versions, snapshots are an immutable subset of a dataset containing
+only some entities and only one version of those entities, typically, the
+latest version at the time the snapshot is created. For data files, TDR uses
+Firestore. Metadata entities that describe data files contain a reference to
+the data file in Firestore. |nn| Both datasets and snapshots are currently
+implemented as Google BigQuery datasets. The tables in the BigQuery dataset
+that backs a TDR snapshot are currently views, not physical tables. |ne|
 
-Metadata consumers query the BigQuery tables or views in a TDR snapshot
-using the BigQuery SQL dialect. This is a very powerful means but comes
-with a relatively steep learning curve. The REST web service exposed by
-Azul, the Data Browser back end is a simpler but less powerful
-alternative that will service most consumers' needs.
+Metadata consumers query the BigQuery tables or views in a TDR snapshot using
+the BigQuery SQL dialect. This is a very powerful means but comes with a
+relatively steep learning curve. The REST web service exposed by Azul, the
+Data Browser back end is a simpler but less powerful alternative that will
+service most consumers' needs.
 
 
 TDR datasets
 ------------
 
-A TDR dataset is made up of one table per concrete HCA metadata entity
-type. These entity types are defined in JSON schema, one schema per
-type. The JSON schema source code is hosted on Github—each
-``*.json`` file underneath `this Github folder <metadata entities_>`_
-defines a concrete HCA entity type. [#]_ Each row in a TDR table
-represents exactly one HCA entity. A *document* is a metadata entity
-serialized as JSON, using one of the concrete schemas.
+A TDR dataset is made up of one table per concrete HCA metadata entity type.
+These entity types are defined in JSON schema, one schema per type. The JSON
+schema source code is hosted on Github—each ``*.json`` file underneath `this
+Github folder <metadata entities_>`_ defines a concrete HCA entity type. [#]_
+Each row in a TDR table represents exactly one HCA entity. A *document* is a
+metadata entity serialized as JSON, using one of the concrete schemas.
 
 .. _metadata entities: https://github.com/HumanCellAtlas/metadata-schema/tree/master/json_schema/type
 
--  The content of a document is stored verbatim (as a variable-length
-   JSON string) in the ``content`` column of a row in the TDR
-   table for entities of the type defined by that schema.
+- The content of a document is stored verbatim (as a variable-length JSON
+  string) in the ``content`` column of a row in the TDR table for entities of
+  the type defined by that schema.
 
--  The ``…_id`` primary key [#]_ (PK) column (e.g.
-   ``cell_suspension_id``) of such a table holds the entity
-   ID, a UUID. The entity ID can also be found in the ``content``
-   column under the ``provenance.document_id`` document
-   path.
+- The ``…_id`` primary key [#]_ (PK) column (e.g. ``cell_suspension_id``) of
+  such a table holds the entity ID, a UUID. The entity ID can also be found in
+  the ``content`` column under the ``provenance.document_id`` document path.
 
--  The ``version`` PK column of each table is a BQ TIMESTAMP. An
-   update to an entity manifests as a new row in the table. The new
-   row has the same ``…_id`` but a strictly greater value in
-   the ``version`` column. For entities imported from the
-   DCP/1 datastore (DSS), this column is set to the version of the
-   corresponding ``*.json`` metadata file in DSS.
+- The ``version`` PK column of each table is a BQ TIMESTAMP. An update to an
+  entity manifests as a new row in the table. The new row has the same
+  ``…_id`` but a strictly greater value in the ``version`` column. For
+  entities imported from the DCP/1 datastore (DSS), this column is set to the
+  version of the corresponding ``*.json`` metadata file in DSS.
 
--  The TDR tables corresponding to `HCA schemas for data files`_
-   such as ``sequence_file``
+- The TDR tables corresponding to `HCA schemas for data files`_ such as
+  ``sequence_file``
 
-   -  have an additional ``FileRef`` column called
-      ``file_id`` containing the DRS URI of the data
-      file, [#]_
+  - have an additional ``FileRef`` column called ``file_id`` containing the
+    DRS URI of the data file, [#]_
 
-   -  and a ``descriptor`` column, a variable-length JSON string
-      containing the file descriptor JSON with properties for
-      checksums, content type and the path of the data file (see
-      `Generic file metadata`_).
+  - and a ``descriptor`` column, a variable-length JSON string containing the
+    file descriptor JSON with properties for checksums, content type and the
+    path of the data file (see `Generic file metadata`_).
 
--  As required by TDR, each row has a ``rowid`` which is an
-   auto-generated UUID assigned by the repo at the time of import.
+- As required by TDR, each row has a ``rowid`` which is an auto-generated UUID
+  assigned by the repo at the time of import.
 
 .. _HCA schemas for data files: https://github.com/HumanCellAtlas/metadata-schema/tree/master/json_schema/type/file
 
-There is currently no database schema migration support in TDR so tables
-can't be created on demand by the importer. Instead, a table for every
-schema type is created when the TDR dataset is created, even if there
-are currently no instances of that schema in any of the staging areas to
-be imported. |nn| Until the final MVP snapshot was released we had the
-freedom to erase all TDR tables, recreate the TDR schema and rerun the
-importers. Post-MVP release, this freedom is greatly restricted and we
-need to rely on schema migration in TDR natively. |ne|
+There is currently no database schema migration support in TDR so tables can't
+be created on demand by the importer. Instead, a table for every schema type
+is created when the TDR dataset is created, even if there are currently no
+instances of that schema in any of the staging areas to be imported. |nn|
+Until the final MVP snapshot was released we had the freedom to erase all TDR
+tables, recreate the TDR schema and rerun the importers. Post-MVP release,
+this freedom is greatly restricted and we need to rely on schema migration in
+TDR natively. |ne|
 
 .. [#]
    Concrete schema types like `sequence_file`_ conceptually inherit an
@@ -204,7 +189,9 @@ need to rely on schema migration in TDR natively. |ne|
    `file_core`_.
 
 .. _sequence_file: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/type/file/sequence_file.json
+
 .. _embedding: https://github.com/HumanCellAtlas/metadata-schema/blob/f37da4858d0a31263d2126246e552f45048cb87c/json_schema/type/file/sequence_file.json#L8
+
 .. _file_core: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/core/file/file_core.json
 
 .. [#]
@@ -220,73 +207,66 @@ need to rely on schema migration in TDR natively. |ne|
 TDR snapshots
 -------------
 
-TDR snapshots follow the same schema except that the value in the
-``file_id`` column is not null and that the ``…_id``
-primary key column is unique i.e., no two versions of the same entity.
+TDR snapshots follow the same schema except that the value in the ``file_id``
+column is not null and that the ``…_id`` primary key column is unique i.e., no
+two versions of the same entity.
 
 
 Subgraphs in TDR (the links table)
 ----------------------------------
 
-The rows in the TDR entity tables represent metadata entities, which can
-also be regarded as vertices in the HCA metadata graph.
+The rows in the TDR entity tables represent metadata entities, which can also
+be regarded as vertices in the HCA metadata graph.
 
 In the DCP/1 data store, the edges in that graph were defined in
-``links.json`` files, one such file per bundle. Each
-``links.json`` file defined a *subgraph* of the overall metadata
-graph. The individual subgraphs were self-contained (all entities in the
-subgraph are present in the bundle) but not disjunct (some edges and
-entities are present in more than one bundle, some in many bundles). To
-update a subgraph one had to create a new bundle, complete with
-references to all entities and data files. To update an entity one had
-to update all bundles referring to it. This was due to the bundle
-referring to specific versions of each entity, even though
-``links.json`` did not. While DCP/1 bundles are extinct in
-DCP/2, the subgraphs as defined by ``links.json`` survive.
+``links.json`` files, one such file per bundle. Each ``links.json`` file
+defined a *subgraph* of the overall metadata graph. The individual subgraphs
+were self-contained (all entities in the subgraph are present in the bundle)
+but not disjunct (some edges and entities are present in more than one bundle,
+some in many bundles). To update a subgraph one had to create a new bundle,
+complete with references to all entities and data files. To update an entity
+one had to update all bundles referring to it. This was due to the bundle
+referring to specific versions of each entity, even though ``links.json`` did
+not. While DCP/1 bundles are extinct in DCP/2, the subgraphs as defined by
+``links.json`` survive.
 
-The TDR dataset uses a dedicated table to store individual subgraphs.
-The table is called ``links`` and it contains a row for each
-subgraph. The columns in that table are
+The TDR dataset uses a dedicated table to store individual subgraphs. The
+table is called ``links`` and it contains a row for each subgraph. The columns
+in that table are
 
--  ``content``, which holds the content of ``links.json``
-   verbatim,
+- ``content``, which holds the content of ``links.json`` verbatim,
 
--  ``project_id`` which is a foreign key (FK) into the
-   ``project`` table,
+- ``project_id`` which is a foreign key (FK) into the ``project`` table,
 
--  and a ``links_id`` PK column. A ``links_id`` identifies a
-   subgraph. For new projects this is a newly allocated UUID
-   identifying each ``links.json`` file. For projects imported from
-   the DSS this is the UUID of each copied bundle. This is done to
-   provide idempotence (ability to rerun the import without having
-   to clear the TDR tables) and provenance (ability to trace data
-   back from TDR to DSS).
+- and a ``links_id`` PK column. A ``links_id`` identifies a subgraph. For new
+  projects this is a newly allocated UUID identifying each ``links.json``
+  file. For projects imported from the DSS this is the UUID of each copied
+  bundle. This is done to provide idempotence (ability to rerun the import
+  without having to clear the TDR tables) and provenance (ability to trace
+  data back from TDR to DSS).
 
--  There is also a ``version`` PK column, a BQ TIMESTAMP. An
-   update to a subgraph manifests as a new row. The new row has the
-   same value in ``links_id`` as the original row and an
-   increased value in ``version``. The two rows also differ
-   in their ``rowid``. For links imported from the DSS, this
-   column is set to the version of the bundle containing the
-   corresponding ``links.json`` metadata file in the DSS.
+- There is also a ``version`` PK column, a BQ TIMESTAMP. An update to a
+  subgraph manifests as a new row. The new row has the same value in
+  ``links_id`` as the original row and an increased value in ``version``. The
+  two rows also differ in their ``rowid``. For links imported from the DSS, this
+  column is set to the version of the bundle containing the corresponding
+  ``links.json`` metadata file in the DSS.
 
 TDR snapshots contain the same table, but just like entity tables in
-snapshots, only one version of a subgraph may exist and the
-``links_id`` column is a unique key for all rows in the
-``links`` table of a snapshot.
+snapshots, only one version of a subgraph may exist and the ``links_id``
+column is a unique key for all rows in the ``links`` table of a snapshot.
 
 
 Subgraph reconstruction
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-In order for metadata consumers to be able to reconstruct the HCA
-metadata subgraphs from the contents of a TDR dataset or snapshot, the
-schema for ``links.json`` was updated so that each reference
-from a link to a process, input or output is qualified with the concrete
-type of the entity, enabling metadata consumers to identify the name of
-the table from which to read the respective process, input or output.
-Under the revised schema, an example entry in ``links.json``
-looks as follows::
+In order for metadata consumers to be able to reconstruct the HCA metadata
+subgraphs from the contents of a TDR dataset or snapshot, the schema for
+``links.json`` was updated so that each reference from a link to a process,
+input or output is qualified with the concrete type of the entity, enabling
+metadata consumers to identify the name of the table from which to read the
+respective process, input or output. Under the revised schema, an example
+entry in ``links.json`` looks as follows::
 
     {
         "process_id": "b7a172d6-dbb1-41f3-8ae4-7807e1eca803", # renamed from process!!!
@@ -311,110 +291,104 @@ looks as follows::
         ]
     }
 
-The steps to reconstruct a subgraph from the tables in a TDR *dataset*
-are as follows:
+The steps to reconstruct a subgraph from the tables in a TDR *dataset* are as
+follows:
 
-#. Given a ``links_id`` (the UUID of a subgraph) and
-   ``version``, fetch the row with that ``links_id``
-   and ``version`` from the ``links`` table.
+1.  Given a ``links_id`` (the UUID of a subgraph) and ``version``, fetch the row
+    with that ``links_id`` and ``version`` from the ``links`` table.
 
-#. Read that row's ``content`` column and iterate over the items
-   of the ``links`` property (a list) of the JSON document in
-   ``content``. For each item aka link,
+2.  Read that row's ``content`` column and iterate over the items of the
+    ``links`` property (a list) of the JSON document in ``content``.
 
-   #. read the ``process`` property, and extract the schema type
-      from the ``process_type`` property and the process
-      UUID from the ``process_id``. Query the TDR table that
-      corresponds to the schema type and fetch all rows where
-      ``{schema_type}_id`` equals the process UUID. Pick the row
-      with the highest version.
+    For each item aka link,
 
-   #. read the ``inputs``, ``outputs`` and
-      ``protocols`` properties (they're all lists). For each
-      input, output and protocol,
+    i.  read the ``process`` property, and extract the schema type from the
+        ``process_type`` property and the process UUID from the
+        ``process_id``. Query the TDR table that corresponds to the schema
+        type and fetch all rows where ``{schema_type}_id`` equals the process
+        UUID. Pick the row with the highest version.
 
-      #. extract the schema type and entity ID. Query the TDR table that
-         corresponds to the schema type and fetch all rows where
-         ``{schema_type}_id`` equals the entity ID. Pick the row
-         with the highest version.
+    ii. read the ``inputs``, ``outputs`` and ``protocols`` properties (they're
+        all lists). 
 
-The steps to reconstruct a graph from a TDR *snapshot* are the same,
-except that there is only one row per entity UUID (only one version of
-that entity) and only one row per ``links_id`` (only one version of that
-subgraph). The reconstruction should fail if multiple versions are
-found.
+        For each input, output and protocol, extract the schema type and
+        entity ID. Query the TDR table that corresponds to the schema type and
+        fetch all rows where ``{schema_type}_id`` equals the entity ID. Pick
+        the row with the highest version.
+
+The steps to reconstruct a graph from a TDR *snapshot* are the same, except
+that there is only one row per entity UUID (only one version of that entity)
+and only one row per ``links_id`` (only one version of that subgraph). The
+reconstruction should fail if multiple versions are found.
 
 
 Subgraph stitching
 ~~~~~~~~~~~~~~~~~~
 
-|nn| One architectural point of contention in DCP/1 was the fact that
-analysis bundles included all the meta(data) from the input bundle. This
-redundancy was one of the reasons the design of the metadata update
-mechanism became so complicated and was never finished. |ne|
+|nn| One architectural point of contention in DCP/1 was the fact that analysis
+bundles included all the meta(data) from the input bundle. This redundancy was
+one of the reasons the design of the metadata update mechanism became so
+complicated and was never finished. |ne|
 
-When Azul indexes an analysis subgraph it needs to associate the
-analysis files in that subgraph with the properties of the biomaterial
-metadata entities in the subgraph that contains the input sequence
-files. Without this, the analysis files wouldn't be discoverable in the
-Data Browser by, say, the species, a property of the
-``donor_organism`` entity, or the assay, a property of the
-``library_preparation_protocol`` entity.
+When Azul indexes an analysis subgraph it needs to associate the analysis
+files in that subgraph with the properties of the biomaterial metadata
+entities in the subgraph that contains the input sequence files. Without this,
+the analysis files wouldn't be discoverable in the Data Browser by, say, the
+species, a property of the ``donor_organism`` entity, or the assay, a property
+of the ``library_preparation_protocol`` entity.
 
-Azul looks for dangling edges in an analysis subgraph, that is, entities
-that occur as an input to an analysis process but that are not contained
-in the analysis subgraph. For each dangling edge, Azul queries the
-``links`` table for subgraphs containing processes that have these
-entities as outputs. It loads all matching subgraphs, connects them to
-the analysis subgraph and repeats the process until no more dangling
-edges exist. Azul then indexes the resulting stitched subgraph as it
-would any other subgraph.
+Azul looks for dangling edges in an analysis subgraph, that is, entities that
+occur as an input to an analysis process but that are not contained in the
+analysis subgraph. For each dangling edge, Azul queries the ``links`` table
+for subgraphs containing processes that have these entities as outputs. It
+loads all matching subgraphs, connects them to the analysis subgraph and
+repeats the process until no more dangling edges exist. Azul then indexes the
+resulting stitched subgraph as it would any other subgraph.
 
 |nn| To summarize, Azul dynamically builds a self-contained subgraph that
 resembles the DCP/2 analysis bundle, but without needing to redundantly
-persist the result, thereby eliminating a complicating factor for
-metadata updates. The downside is that consumers of the raw metadata in
-TDR would also have to stitch subgraphs in order to get a complete,
-self-contained analysis subgraph. One mitigation would be for Azul to
-store the all subgraphs (stitched analysis subgraphs as well as primary
-subgraphs) verbatim in its own index and expose them for access via its
-REST API. This would eliminate not only the need for consumers to stitch
-subgraphs, but also the need to learn BigQuery and the TDR schema. |ne|
+persist the result, thereby eliminating a complicating factor for metadata
+updates. The downside is that consumers of the raw metadata in TDR would also
+have to stitch subgraphs in order to get a complete, self-contained analysis
+subgraph. One mitigation would be for Azul to store the all subgraphs
+(stitched analysis subgraphs as well as primary subgraphs) verbatim in its own
+index and expose them for access via its REST API. This would eliminate not
+only the need for consumers to stitch subgraphs, but also the need to learn
+BigQuery and the TDR schema. |ne|
 
 
 Supplementary files
 -------------------
 
-… in DCP/1 were not linked as part of ``links.json``. Their mere presence
-in a bundle associated them with the project. There are no bundles in
-DCP/2 so, the schema for ``links.json`` has been refactored to
-accommodate a new type of ``supplementary_file_link``, in
-addition to the existing ``process_link``. This new type of link
-is used to associate an entity (currently only those of type
-`project`_) with a `supplementary_file`_.
-The DSS adapter scans each bundle for supplementary files and adds links
-to ``link.json`` accordingly.
+… in DCP/1 were not linked as part of ``links.json``. Their mere presence in a
+bundle associated them with the project. There are no bundles in DCP/2 so, the
+schema for ``links.json`` has been refactored to accommodate a new type of
+``supplementary_file_link``, in addition to the existing ``process_link``.
+This new type of link is used to associate an entity (currently only those of
+type `project`_) with a `supplementary_file`_. The DSS adapter scans each
+bundle for supplementary files and adds links to ``link.json`` accordingly.
 
 .. _project: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/type/project/project.json
+
 .. _supplementary_file: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/type/file/supplementary_file.json
 
 
 Generic file metadata
 ---------------------
 
-The bundle manifest entries in the DCP/1 datastore (DSS) contain certain
-data file properties that aren't captured anywhere else. Because of the
-absence of bundles in DCP/2, these properties are instead stored in a
-*file descriptor*, as defined by the `file_descriptor.json`_
-schema in the ``system`` directory of the metadata-schema repository.
-The DSS adapter and EBI Ingest Exporter adapter create a file descriptor
-for each data file in a staging area. These file descriptors are objects
-underneath the ``descriptors`` directory of the staging area.
+The bundle manifest entries in the DCP/1 datastore (DSS) contain certain data
+file properties that aren't captured anywhere else. Because of the absence of
+bundles in DCP/2, these properties are instead stored in a *file descriptor*,
+as defined by the `file_descriptor.json`_ schema in the ``system`` directory
+of the metadata-schema repository. The DSS adapter and EBI Ingest Exporter
+adapter create a file descriptor for each data file in a staging area. These
+file descriptors are objects underneath the ``descriptors`` directory of the
+staging area.
 
 .. _file_descriptor.json: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/system/file_descriptor.json
 
-TDR stores the descriptor verbatim in the ``descriptor`` column
-of each ``…_file`` table in the TDR dataset.
+TDR stores the descriptor verbatim in the ``descriptor`` column of each
+``…_file`` table in the TDR dataset.
 
 An example file descriptor follows below::
 
@@ -433,146 +407,136 @@ An example file descriptor follows below::
         "s3_etag": "c92e5374ac0a53b228d4c1511c2d2842-63"
     }
 
--  The ``file_name`` property is the object name of the data
-   file relative to the staging area’s data/ directory . It may
-   contain slashes but must not start or end in a slash. An adapter
-   is free to choose whatever naming system for data files it deems
-   appropriate. Note that this permits naming schemes that use
-   content addressing for deduplication. The DSS adapter uses the
-   bundle UUID (same as ``links_id``) and the
-   ``file_name`` property of a file's entry in the bundle
-   manifest to determine the value for ``file_name``. [#]_
+- The ``file_name`` property is the object name of the data file relative to
+  the staging area’s data/ directory . It may contain slashes but must not
+  start or end in a slash. An adapter is free to choose whatever naming system
+  for data files it deems appropriate. Note that this permits naming schemes
+  that use content addressing for deduplication. The DSS adapter uses the
+  bundle UUID (same as ``links_id``) and the ``file_name`` property of a
+  file's entry in the bundle manifest to determine the value for
+  ``file_name``. [#]_
 
--  ``file_id`` is a UUID that uniquely identifies each data file
-   in the source. The DSS adapter, for example, uses the DSS file
-   UUID for ``file_id``. This is not the same as the ``file_id``
-   columns in the TDR tables for metadata entities describing data
-   files since they are FireStore references specific to TDR).
-   Typically, the ``file_id`` in descriptors is also
-   different from the ``…_file_id``
-   (``sequence_file_id`` or ``analysis_file_id``, for
-   example) columns of those tables since those columns identify the
-   metadata entity describing the data file, not the data file
-   itself.
+- ``file_id`` is a UUID that uniquely identifies each data file in the source.
+  The DSS adapter, for example, uses the DSS file UUID for ``file_id``. This
+  is not the same as the ``file_id`` columns in the TDR tables for metadata
+  entities describing data files since they are FireStore references specific
+  to TDR). Typically, the ``file_id`` in descriptors is also different from
+  the ``…_file_id`` (``sequence_file_id`` or ``analysis_file_id``, for
+  example) columns of those tables since those columns identify the metadata
+  entity describing the data file, not the data file itself.
 
--  The ``file_version`` field uses the same syntax as in object
-   names for metadata entities. It denotes the version of the
-   datafile. The DSS adapter uses the DSS file version for this.
+- The ``file_version`` field uses the same syntax as in object names for
+  metadata entities. It denotes the version of the datafile. The DSS adapter
+  uses the DSS file version for this.
 
--  ``content_type`` is an appropriate MIME type of the data
-   file's content. It should be consistent with the value of the
-   Content-Type header an HTTP server would use when serving the
-   data file.
+- ``content_type`` is an appropriate MIME type of the data file's content. It
+  should be consistent with the value of the Content-Type header an HTTP
+  server would use when serving the data file.
 
--  ``crc32c``, ``sha1``, ``sha256`` and
-   ``s3_etag`` are the respective hashes of the content.
-   Note that the schema only permits lowercase hexadecimal
-   characters to avoid ambiguity. [#]_ As opposed to the other
-   hashes, the S3 ETag does not unambiguously represent a particular
-   data file content. There can be many different S3 ETags for the
-   same sequence of bytes.
+- ``crc32c``, ``sha1``, ``sha256`` and ``s3_etag`` are the respective hashes
+  of the content. Note that the schema only permits lowercase hexadecimal
+  characters to avoid ambiguity. [#]_ As opposed to the other hashes, the S3
+  ETag does not unambiguously represent a particular data file content. There
+  can be many different S3 ETags for the same sequence of bytes.
 
 The name of a descriptor object in a staging area is derived from the
-identifier of the metadata entity describing the data file, i.e. the
-value that ends up in the ``…_file_id`` column
-(``sequence_file_id`` or ``analysis_file_id``, for
-example) of the corresponding TDR entity table. For details, see `Data
-exchange format`_.
+identifier of the metadata entity describing the data file, i.e. the value
+that ends up in the ``…_file_id`` column (``sequence_file_id`` or
+``analysis_file_id``, for example) of the corresponding TDR entity table. For
+details, see `Data exchange format`_.
 
-If no ``file_id`` is defined organically for data files, it is
-recommended to only allocate a random UUIDv4 for the ``file_id``
-in the descriptor and derive another UUIDv5 from that UUIDv4 for the
-``…_file_id`` of the metadata entity. This has the advantage of
-being deterministic without requiring a persistent mapping between the
-two. Similarly, instead of allocating a random UUIDv4 for the descriptor
-``file_id`` one could also derive a UUIDv5 from the SHA-1 or SHA-256
-hashes of the data file's content.
+If no ``file_id`` is defined organically for data files, it is recommended to
+only allocate a random UUIDv4 for the ``file_id`` in the descriptor and derive
+another UUIDv5 from that UUIDv4 for the ``…_file_id`` of the metadata entity.
+This has the advantage of being deterministic without requiring a persistent
+mapping between the two. Similarly, instead of allocating a random UUIDv4 for
+the descriptor ``file_id`` one could also derive a UUIDv5 from the SHA-1 or
+SHA-256 hashes of the data file's content.
 
-.. [#]
-   If a file is referenced by multiple bundles using different file
-   names, the DSS adapter stages multiple objects with the same content.
-   This case occurs in the wild, but is of negligible impact (< 1% in
-   volume, zarr store members and PDFs documenting experimental
-   protocols).
+.. [#] 
+   If a file is referenced by multiple bundles using different file names, the
+   DSS adapter stages multiple objects with the same content. This case occurs
+   in the wild, but is of negligible impact (< 1% in volume, zarr store
+   members and PDFs documenting experimental protocols).
 
 .. [#]
-   many developers erroneously compare the string representation of
-   content hashes (and UUIDs for that matter) using a case sensitive
-   quality comparison
+   many developers erroneously compare the string representation of content
+   hashes (and UUIDs for that matter) using a case sensitive quality
+   comparison
 
 
 Analysis provenance
 -------------------
 
 In DCP/1, an analysis bundle (a bundle containing output files from an
-analysis workflow) referred to the input bundle (a bundle that contains
-the input files) via the
-`input_bundles`_ property of the ``analysis_process`` entity. [#]_ This was
-problematic in two ways: 1) the bundle version is missing and 2)
-metadata should be agnostic to bundles. The ``analysis_process``
-schema also requires a ``reference_bundle`` property for
-specifying the bundle that contains the reference files. This property
-also suffers from the same problems. The two properties of an
-``analysis_process`` entity and the ``links.json`` files
-are the only places where metadata mentions bundles in DCP/1.
+analysis workflow) referred to the input bundle (a bundle that contains the
+input files) via the `input_bundles`_ property of the ``analysis_process``
+entity. [#]_ This was problematic in two ways: 1) the bundle version is
+missing and 2) metadata should be agnostic to bundles. The
+``analysis_process`` schema also requires a ``reference_bundle`` property for
+specifying the bundle that contains the reference files. This property also
+suffers from the same problems. The two properties of an ``analysis_process``
+entity and the ``links.json`` files are the only places where metadata
+mentions bundles in DCP/1.
 
 .. _input_bundles: https://github.com/HumanCellAtlas/metadata-schema/blob/f37da4858d0a31263d2126246e552f45048cb87c/json_schema/type/process/analysis/analysis_process.json#L184
 
-To solve both problems, the ``analysis_process`` schema was
-revised to instead list references to the metadata entities that
-describe the individual reference data files in a property called
-``reference_files``. The ``input_bundles`` and
-``reference_bundle`` properties were removed. Note that an entry
-in ``reference_files`` does not directly reference a data file,
-but instead references the metadata entity that describes the data file.
+To solve both problems, the ``analysis_process`` schema was revised to instead
+list references to the metadata entities that describe the individual
+reference data files in a property called ``reference_files``. The
+``input_bundles`` and ``reference_bundle`` properties were removed. Note that
+an entry in ``reference_files`` does not directly reference a data file, but
+instead references the metadata entity that describes the data file.
 
-|nn| After MVP we should consider moving the ``reference_files``
-property to the ``analysis_protocol`` entity or model the
-reference files as regular input files to an ``analysis_process`` in the
-``links`` table (`metadata-schema #1288`_). |ne|
+|nn| After MVP we should consider moving the ``reference_files`` property to
+the ``analysis_protocol`` entity or model the reference files as regular input
+files to an ``analysis_process`` in the ``links`` table (`metadata-schema
+#1288`_). |ne|
 
 .. _metadata-schema #1288: https://github.com/HumanCellAtlas/metadata-schema/issues/1288
 
 .. [#]
-   While the schema allows multiple input bundles, the analysis bundles
-   in the wild only have one.
+   While the schema allows multiple input bundles, the analysis bundles in the
+   wild only have one.
 
 
 Naming datasets and snapshots
 -----------------------------
 
-|nn| This section contains specific details that anticipate that the DCP/2
-will soon need to support multiple snapshots of per catalog, at least
-one per project, potentially more than one per project. When it was
-written, TDR did not have the ability to sort the snapshot/dataset
-listing or associate additional metadata with datasets/snapshots aka
-"labeling". There are two motivations why we needed a consistent naming
-scheme for datasets and snapshots:
+|nn| 
 
-#. There exist uniqueness constraints on snapshots: For example, there
-   should only be one "active" snapshot per TDR deployment and HCA
-   project. If there are multiple snapshots in the same deployment
-   for the same project their creation date should disambiguate and
-   order them, such that it is obvious which of them is the latest
-   one. A naming scheme, if followed, helps with that, especially in
-   the absence of TDR features like labeling and sorting, and
-   enforcing these uniqueness constraints.
+This section contains specific details that anticipate that the DCP/2
+will soon need to support multiple snapshots of per catalog, at least one per
+project, potentially more than one per project. When it was written, TDR did
+not have the ability to sort the snapshot/dataset listing or associate
+additional metadata with datasets/snapshots aka "labeling". There are two
+motivations why we needed a consistent naming scheme for datasets and
+snapshots:
 
-#. Not having a naming scheme means that names will be arbitrary and
-   ultimately confusing. **If** names are used, the names should be
-   chosen systematically. The only alternative to using names that
-   follow a scheme is to ignore names altogether and use UUIDs
-   instead. But this requires that labelling, sorting and filtering
-   are available when listing datasets and snapshots using the TDR
-   API. Additionally, IDs are hard to read to the human eye, and
-   hard to distinguish visually, so as long as we manually confer
-   them between teams, names are preferred. |ne|
+1. There exist uniqueness constraints on snapshots: For example, there should
+   only be one "active" snapshot per TDR deployment and HCA project. If there
+   are multiple snapshots in the same deployment for the same project their
+   creation date should disambiguate and order them, such that it is obvious
+   which of them is the latest one. A naming scheme, if followed, helps with
+   that, especially in the absence of TDR features like labeling and sorting,
+   and enforcing these uniqueness constraints.
 
-Grammars below use a mix of `EBNF`_
-and regular expressions. They are designed to be easily parsed, either
-using regular expressions or by splitting on underscore, and so that a
-lexicographical sorting reflects both the hierarchical relationship
-between datasets and snapshots as well as the time they were created. ::
+2. Not having a naming scheme means that names will be arbitrary and
+   ultimately confusing. **If** names are used, the names should be chosen
+   systematically. The only alternative to using names that follow a scheme is
+   to ignore names altogether and use UUIDs instead. But this requires that
+   labelling, sorting and filtering are available when listing datasets and
+   snapshots using the TDR API. Additionally, IDs are hard to read to the
+   human eye, and hard to distinguish visually, so as long as we manually
+   confer them between teams, names are preferred. 
+
+|ne|
+
+Grammars below use a mix of `EBNF`_ and regular expressions. They are designed
+to be easily parsed, either using regular expressions or by splitting on
+underscore, and so that a lexicographical sorting reflects both the
+hierarchical relationship between datasets and snapshots as well as the time
+they were created. ::
 
     dataset_name = "hca_" , deployment , "_" , creation_date , ["_" , qualifier]
 
@@ -638,131 +602,125 @@ Snapshot examples::
 Data exchange format
 ====================
 
-The `Terra Data Repository schema`_ is in use for (meta)data
-migrated from the DCP/1 datastore (DSS) as well as (meta)data for new
-projects from EBI Ingest. Ad-hoc scripts could have been used to push
-the data from a source directly into TDR but to further standardize the
-imports, the import process is split into two phases, with (meta)data
-staged in a folder in a GCS bucket in between these phases. This folder
-is referred to as a *staging area*.
+The `Terra Data Repository schema`_ is in use for (meta)data migrated from the
+DCP/1 datastore (DSS) as well as (meta)data for new projects from EBI Ingest.
+Ad-hoc scripts could have been used to push the data from a source directly
+into TDR but to further standardize the imports, the import process is split
+into two phases, with (meta)data staged in a folder in a GCS bucket in between
+these phases. This folder is referred to as a *staging area*.
 
 The content of a staging area follows a standardized exchange format. A
-staging area is defined by a URI of the form
-``gs://{bucket}/{prefix}``. The prefix must either be empty or
-end in a slash if it is not.
+staging area is defined by a URI of the form ``gs://{bucket}/{prefix}``. The
+prefix must either be empty or end in a slash if it is not.
 
-In the first phase, a source-specific *adapter* process pulls the
-(meta)data files from the source, optionally pre-processes or transforms
-them, and finally deposits them in the staging area.
+In the first phase, a source-specific *adapter* process pulls the (meta)data
+files from the source, optionally pre-processes or transforms them, and
+finally deposits them in the staging area.
 
-In the second phase, an *importer* program pushes the data from the
-staging area into TDR.
+In the second phase, an *importer* program pushes the data from the staging
+area into TDR.
 
-|nn| This design has the advantage that the code for interacting with TDR
-only needs to be written once, simplifying the implementation of the
-various adapters. It also allows the data to be staged incrementally and
-to be validated prior to the actual import. Using a GCS bucket for
-staging areas makes it possible to utilize GCP's cheap copies for the
-DSS adapter. |ne|
+|nn| This design has the advantage that the code for interacting with TDR only
+needs to be written once, simplifying the implementation of the various
+adapters. It also allows the data to be staged incrementally and to be
+validated prior to the actual import. Using a GCS bucket for staging areas
+makes it possible to utilize GCP's cheap copies for the DSS adapter. |ne|
 
-One bucket may contain multiple areas, from the same source or from a
-range of sources. A staging area may contain meta(data) from multiple
-HCA projects, or just one. If a staging area contains meta(data) for
-only one project, its ``prefix`` must end in
-``{project_id}/``. There may be more than one staging area for a
-given HCA project (for different deployments, for example) but each one
-should be complete (cover the entire project) and no two staging areas
-for the same project should ever be imported into the same TDR dataset.
+One bucket may contain multiple areas, from the same source or from a range of
+sources. A staging area may contain meta(data) from multiple HCA projects, or
+just one. If a staging area contains meta(data) for only one project, its
+``prefix`` must end in ``{project_id}/``. There may be more than one staging
+area for a given HCA project (for different deployments, for example) but each
+one should be complete (cover the entire project) and no two staging areas for
+the same project should ever be imported into the same TDR dataset.
 
-For new DCP/2 datasets wrangled by EBI/UCSC, each project is treated as
-one source and has its own staging area. All staging areas for such
-projects appear in the staging bucket under a common folder.
+For new DCP/2 datasets wrangled by EBI/UCSC, each project is treated as one
+source and has its own staging area. All staging areas for such projects
+appear in the staging bucket under a common folder.
 
 
 Staging area layout
 -------------------
 
 Object names given in this section are relative to the staging area. To
-produce the complete ``gs://…`` URI of a particular object in the
-staging area, append the object's name to the staging area URI. [#]_
+produce the complete ``gs://…`` URI of a particular object in the staging
+area, append the object's name to the staging area URI. [#]_
 
 There are four object naming schemes, one for data files, one for file
 descriptors, one for metadata files and one for ``links.json`` files.
 
--  The object name of a metadata entity is::
+- The object name of a metadata entity is::
 
-        metadata/{entity_type}/{entity_id}_{version}.json
+    metadata/{entity_type}/{entity_id}_{version}.json
 
-   where
+  where
 
-   ``entity_type``
-       is the `HCA schema entity type`_
-       such as ``cell_suspension``.
+  ``entity_type``  
+    is the `HCA schema entity type`_ such as ``cell_suspension``.
 
-   ``entity_id``
-       is a UUID that uniquely identifies the metadata
-       entity. [#]_ The TDR importer uses ``entity_id`` as the
-       PK for the row in the corresponding BQ table e.g., the
-       ``cell_suspension_id`` column of the
-       ``cell_suspension`` table.
+  ``entity_id``
+    is a UUID that uniquely identifies the metadata entity. [#]_ The TDR
+    importer uses ``entity_id`` as the PK for the row in the corresponding BQ
+    table e.g., the ``cell_suspension_id`` column of the ``cell_suspension``
+    table.
 
-   ``version``
-       is an ISO timestamp with the ``Z`` suffix
-       for UTC and a six-digit number of microseconds left-padded with
-       leading zeros if necessary, e.g.,
-       ``2020-05-01T04:26:07.021870Z``. Not every ISO syntax is
-       supported, only those that match the regex:
-       ``\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z`` To avoid
-       ambiguous string representations of the same version timestamp,
-       the ``Z`` suffix is mandated and the microseconds field
-       can't be omitted. Whole seconds must be specified as ``.000000``.
-       The DSS adapter uses the DSS version of the metadata file,
-       converting it to this restricted ISO syntax.
+  ``version``
+    is an ISO timestamp with the ``Z`` suffix for UTC and a six-digit number
+    of microseconds left-padded with leading zeros if necessary, e.g.,
+    ``2020-05-01T04:26:07.021870Z``. Not every ISO syntax is supported, only
+    those that match the regex::
+
+      \d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z
+
+    To avoid ambiguous string representations of the same version timestamp,
+    the ``Z`` suffix is mandated and the microseconds field can't be omitted.
+    Whole seconds must be specified as ``.000000``. The DSS adapter uses the
+    DSS version of the metadata file, converting it to this restricted ISO
+    syntax.
 
 .. _HCA schema entity type: https://github.com/HumanCellAtlas/metadata-schema/tree/master/json_schema/type
 
--  The object name of a file descriptor is::
+- The object name of a file descriptor is::
 
-        descriptors/{entity_type}/{entity_id}_{version}.json
+    descriptors/{entity_type}/{entity_id}_{version}.json
 
-   where ``entity_type``, ``entity_id`` and ``version`` have the same meaning
-   as for metadata entities, except that the value of ``entity_type`` has to
-   end in ``_file``. File descriptors are JSON documents and are described in
-   `Generic file metadata`_.
+  where ``entity_type``, ``entity_id`` and ``version`` have the same meaning
+  as for metadata entities, except that the value of ``entity_type`` has to
+  end in ``_file``. File descriptors are JSON documents and are described in
+  `Generic file metadata`_.
 
--  The object name of a data file is::
+- The object name of a data file is::
 
-       data/{file_name}
+    data/{file_name}
 
-   where
+  where
 
-   ``file_name``
-       is the ``file_name`` property from the
-       file descriptor object for this data file.
+  ``file_name``  
+    is the ``file_name`` property from the file descriptor object for this
+    data file.
 
--  The object name for ``links.json`` files is::
+- The object name for ``links.json`` files is::
 
-       links/{links_id}_{version}_{project_id}.json
+    links/{links_id}_{version}_{project_id}.json
 
-   where
+  where
 
-   ``links_id``
-       is a UUID that uniquely identifies the subgraph.
-       The DSS adapter uses the bundle UUID.
+  ``links_id`` 
+    is a UUID that uniquely identifies the subgraph. The DSS adapter uses the
+    bundle UUID.
 
-   ``version``
-       field uses the same syntax as in object names
-       for metadata entities. It denotes the version of the subgraph.
-       The DSS adapter uses the DSS bundle version.
+  ``version``
+    field uses the same syntax as in object names for metadata entities. It
+    denotes the version of the subgraph. The DSS adapter uses the DSS bundle
+    version.
 
-   ``project_id``
-       field identifies the project the subgraph
-       is part of. A subgraph is part of exactly one project. The
-       ``project_id`` field is at the end of the object path so
-       that the importer, using a prefix query, can look up subgraph
-       objects by their ID without knowing the project ID. The importer
-       must record an error if it detects more than one object with the
-       same ``links/{links_id}_{version}_`` prefix.
+  ``project_id``
+    field identifies the project the subgraph is part of. A subgraph is part
+    of exactly one project. The ``project_id`` field is at the end of the
+    object path so that the importer, using a prefix query, can look up
+    subgraph objects by their ID without knowing the project ID. The importer
+    must record an error if it detects more than one object with the same
+    ``links/{links_id}_{version}_`` prefix.
 
 .. [#]
    The staging area URI is guaranteed to end in a slash.
@@ -775,50 +733,47 @@ descriptors, one for metadata files and one for ``links.json`` files.
 Data file paths
 ---------------
 
-Metadata entities that are instances of the `HCA schema types for
-describing data files`_
-refer to their corresponding data files using the
-`file_core.file_name`_
-property. This property contains a file path, not a unique identifier.
-In DCP/1, that path to a data file is interpreted relative to the bundle
-referencing the data file. That's actually the only means in DCP/1 by
-which a data file is connected to the metadata file describing it.
+Metadata entities that are instances of the `HCA schema types for describing
+data files`_ refer to their corresponding data files using the
+`file_core.file_name`_ property. This property contains a file path, not a
+unique identifier. In DCP/1, that path to a data file is interpreted relative
+to the bundle referencing the data file. That's actually the only means in
+DCP/1 by which a data file is connected to the metadata file describing it.
 
 .. _HCA schema types for describing data files: https://github.com/HumanCellAtlas/metadata-schema/tree/master/json_schema/type/file
+
 .. _file_core.file_name: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/core/file/file_core.json#L24
 
 In the DCP/2 MVP, import adapters instead create *file descriptors* that
-connect metadata entities to the data files they describe. A file
-descriptor is an object in the staging area, whose name contains the
-metadata entity's coordinates (``entity_type``,
-``entity_id``, and ``version``). The descriptor contains
-the name of the data file relative to the staging area as well as the
+connect metadata entities to the data files they describe. A file descriptor
+is an object in the staging area, whose name contains the metadata entity's
+coordinates (``entity_type``, ``entity_id``, and ``version``). The descriptor
+contains the name of the data file relative to the staging area as well as the
 data file's unique identifier and version.
 
 The importer is free to use any virtual file path for TDR it deems
-appropriate. |nn| Possible virtual file path patterns are
-*content-addressed* (using just ``{descriptor.sha1}`` for example) or
-*subgraph-relative* (using
+appropriate. |nn| Possible virtual file path patterns are *content-addressed*
+(using just ``{descriptor.sha1}`` for example) or *subgraph-relative* (using
 ``{links_id}/{content.file_core.file_name}``). |ne|
 
-Initially, the bundle-relative path of a data file in DCP/1 was not
-allowed to contain slashes, forcing bundles to be flat. This limitation
-has been in part addressed, but when the DCP/1 was shut down, many
-bundles (like those with zarray matrices) still contained file names
-that work around this limitation by using ``!`` instead of ``/``. The DSS
-adapter undoes the substitution. That is the only modification the DSS
-adapter applies to the `file_core.file_name`_ property.
+Initially, the bundle-relative path of a data file in DCP/1 was not allowed to
+contain slashes, forcing bundles to be flat. This limitation has been in part
+addressed, but when the DCP/1 was shut down, many bundles (like those with
+zarray matrices) still contained file names that work around this limitation
+by using ``!`` instead of ``/``. The DSS adapter undoes the substitution. That
+is the only modification the DSS adapter applies to the `file_core.file_name`_
+property.
 
 
 Importer idempotence
 --------------------
 
-The importer should not copy a data file if it is already present in TDR
-and the checksums match between the copy of the file in the staging area
-and the one in TDR/Firestore.
+The importer should not copy a data file if it is already present in TDR and
+the checksums match between the copy of the file in the staging area and the
+one in TDR/Firestore.
 
-Similarly, the importer must not create a new row in a TDR table if that
-row would be identical to another row except for its ``rowid``.
+Similarly, the importer must not create a new row in a TDR table if that row
+would be identical to another row except for its ``rowid``.
 
 
 Summary of schema changes
@@ -859,13 +814,12 @@ release of the DCP/2. The table is for information only. |ne|
 Schema validation
 -----------------
 
-The importer validates every JSON document it processes using an
-off-the-shelf JSONSchema validator. This is done to ensure that the DSS
-adapter didn't introduce schema violations when rewriting documents to
-match the schema changes made necessary by the DCP/2 MVP. No ontology
-term validation occurs. Validation errors result in an immediate
-termination of the importer without processing the remaining objects in
-the staging area.
+The importer validates every JSON document it processes using an off-the-shelf
+JSONSchema validator. This is done to ensure that the DSS adapter didn't
+introduce schema violations when rewriting documents to match the schema
+changes made necessary by the DCP/2 MVP. No ontology term validation occurs.
+Validation errors result in an immediate termination of the importer without
+processing the remaining objects in the staging area.
 
 See also `Import errors`_.
 
@@ -874,47 +828,43 @@ Invalid documents in the DCP/1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 There was one known existing schema violation in documents in the DCP/1
-production instance of DSS. The
-``provenance.schema_major_version`` and
-``provenance.schema_minor_version`` properties are present in
-metadata files submitted to the DSS from around Oct 2019 onwards. The
-addition of these fields was proposed in `RFC 11`_.
-After that RFC was accepted, the ``provenance`` schema was
-revised and the Ingest component was modified to add those fields to
-documents but the schema reference in those documents still points at an
-old schema, not the revised one. This is further complicated by the fact
-that the ``provenance`` schema is referenced indirectly via the
-main document schema (`example document`_, link now broken since DSS is EOL).
+production instance of DSS. The ``provenance.schema_major_version`` and
+``provenance.schema_minor_version`` properties are present in metadata files
+submitted to the DSS from around Oct 2019 onwards. The addition of these
+fields was proposed in `RFC 11`_. After that RFC was accepted, the
+``provenance`` schema was revised and the Ingest component was modified to add
+those fields to documents but the schema reference in those documents still
+points at an old schema, not the revised one. This is further complicated by
+the fact that the ``provenance`` schema is referenced indirectly via the main
+document schema (`example document`_, link now broken since DSS is EOL).
 
-The ``analysis_file`` schema in that document is at version
-6.0.0 while the new fields were introduced in version 6.2.0 (via the
-``provenance`` schema version 1.1.0). The problem affects all
-metadata documents submitted after October of 2019, not just
-``analysis_file`` documents.
+The ``analysis_file`` schema in that document is at version 6.0.0 while the
+new fields were introduced in version 6.2.0 (via the ``provenance`` schema
+version 1.1.0). The problem affects all metadata documents submitted after
+October of 2019, not just ``analysis_file`` documents.
 
 .. _RFC 11: https://github.com/HumanCellAtlas/dcp-community/blob/master/rfcs/text/0011-query-by-metadata-schema-versions.md
+
 .. _example document: http://dss.data.humancellatlas.org/v1/files/003d3dda-6906-4943-9f12-331b963e2f55?replica=aws
 
-To address this issue, the DSS adapter removes those two fields and the
-Ingest adapter is modified to not emit them. Luckily, the fields are not
-required so removing them from documents that **do** happen to carry an
-updated schema declaration does **not** invalidate those documents. `The
-provenance schema will be revised to remove the fields
-again <provenance schema_>`_.
+To address this issue, the DSS adapter removes those two fields and the Ingest
+adapter is modified to not emit them. Luckily, the fields are not required so
+removing them from documents that **do** happen to carry an updated schema
+declaration does **not** invalidate those documents. `The provenance schema
+will be revised to remove the fields again <provenance schema_>`_.
 
 .. _provenance schema: https://github.com/HumanCellAtlas/metadata-schema/issues/1316
 
-It was also determined that some metadata documents in DCP/1 contain
-schema URLs with a host name that points to a non-production instance of
-the site where the schemas are published, namly
+It was also determined that some metadata documents in DCP/1 contain schema
+URLs with a host name that points to a non-production instance of the site
+where the schemas are published, namly
 ``schema.staging.data.humancellatlas.org`` and
-``schema.dev.data.humancellatlas.org``. It was established that
-the schemas referenced via these URLs were identical to their
-counterparts on ``schema.humancellatlas.org``. In order to keep
-the affected documents valid, the DCP/2 will maintain the non-production
-instances until the metadata documents are corrected and we stop
-supporting the releases affected by this issue (currently dcp1 and
-dcp2).
+``schema.dev.data.humancellatlas.org``. It was established that the schemas
+referenced via these URLs were identical to their counterparts on
+``schema.humancellatlas.org``. In order to keep the affected documents valid,
+the DCP/2 will maintain the non-production instances until the metadata
+documents are corrected and we stop supporting the releases affected by this
+issue (currently dcp1 and dcp2).
 
 
 Import errors
@@ -922,13 +872,12 @@ Import errors
 
 This work is currenly in progress and tracked by DSPDC-1604.
 
-Errors that occur during the importer's processing of the staging area
-for a particular source are logged by the importer to dedicated files in
-the staging area. The object naming scheme for these error log files is
-``errors/{timestamp}.json`` where ``timestamp`` is the
-start time of the importer invocation. The format of the file is
-`JSON Lines`_ but only errors should be logged. An
-empty file indicates that no errors occurred.
+Errors that occur during the importer's processing of the staging area for a
+particular source are logged by the importer to dedicated files in the staging
+area. The object naming scheme for these error log files is
+``errors/{timestamp}.json`` where ``timestamp`` is the start time of the
+importer invocation. The format of the file is `JSON Lines`_ but only errors
+should be logged. An empty file indicates that no errors occurred.
 
 .. _JSON Lines: http://jsonlines.org/
 
@@ -955,36 +904,33 @@ For example::
 The following types of errors will be logged:
 
 ``SchemaValidationError``
-    is logged if any metadata does
-    not match the schema that it points to
+  is logged if any metadata does not match the schema that it points to
 
 ``ChecksumError``
-    is logged if there are checksum mismatches for files
+  is logged if there are checksum mismatches for files
 
 ``ImportError``
-    is logged if the import tool has an internal error
+  is logged if the import tool has an internal error
 
 ``RepoError``
-    is logged if there is an error interacting
-    with TDR
+  is logged if there is an error interacting with TDR
 
 ``FileMismatchError``
-    is logged if one or more of the
-    following three items are missing for a given data file:
+  is logged if one or more of the following three items are missing for a
+  given data file:
 
-    -  the actual data file,
+  - the actual data file,
 
-    -  the associated metadata file,
+  - the associated metadata file,
 
-    -  or the file descriptor
+  - or the file descriptor
 
-    The missing items are specified in the error ``message``.
+  The missing items are specified in the error ``message``.
 
-If an import fails, the #ingest-to-tdr-shared Slack channel will receive
-a notification with a link to the error log. For now, retries for
-running the import tool with be requested manually in
-#ingest-to-tdr-shared Slack channel (point of contact is @raaid from the
-Broad Institute).
+If an import fails, the #ingest-to-tdr-shared Slack channel will receive a
+notification with a link to the error log. For now, retries for running the
+import tool with be requested manually in #ingest-to-tdr-shared Slack channel
+(point of contact is @raaid from the Broad Institute).
 
 
 
@@ -992,16 +938,16 @@ Broad Institute).
 Project-level matrices
 ======================
 
-In the context of the HCA DCP, a matrix is a two-dimensional structure relating
-individual cell identities (or an approximation thereof) to properties of the
-the transcriptome of those cells e.g., genes expressed in the transcriptome,
-number of those cells.
+In the context of the HCA DCP, a matrix is a two-dimensional structure
+relating individual cell identities (or an approximation thereof) to
+properties of the the transcriptome of those cells e.g., genes expressed in
+the transcriptome, number of those cells.
 
 A *project-level* matrix is a matrix that covers all or a large subset of the
 cells involved in the experiments for a particular project. A project-level
 matrix is *stratified* if it is partitioned over separate files, using certain
-criteria on the properties of the experiments in a project or the cells studied
-in those experiments.
+criteria on the properties of the experiments in a project or the cells
+studied in those experiments.
 
 A matrix from a contributor or any other source external to the DCP is refered
 to as a *contributor-generated* matrix. This definition includes supporting
@@ -1028,10 +974,10 @@ Describing CGMs as supplementary files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 |nn| The mechanism described in this section is deprecated and should not be
-used. The the DCP/2 MVP release, also known as ``dcp2``, and subsequent releases
-``dcp3`` and ``dcp4`` use this mechanism to describe CGMs. The solution that
-replaces this deprecated mechanism is defined `Describing CGMs as analysis
-files`_ |ne|
+used. The the DCP/2 MVP release, also known as ``dcp2``, and subsequent
+releases ``dcp3`` and ``dcp4`` use this mechanism to describe CGMs. The
+solution that replaces this deprecated mechanism is defined `Describing CGMs
+as analysis files`_ |ne|
 
 For DCP/2 MVP, no post-processing is performed on contributor-generated
 matrices. Users will be able to download them in exactly the same file format
@@ -1113,35 +1059,35 @@ The ``file_description`` property is set to a value matching to the following
 EBNF/Regex, starting at the ``strata`` non-terminal::
 
     strata = "" | stratum , { "\n" , stratum }
+
     stratum = point , { ";" , point }
+    
     point = dimension , "=" , values
+    
     dimension = "genusSpecies" | "organ" | "developmentStage" | "libraryConstructionApproach"
+    
     values = value , { "," , value }
+    
     value = [^\n;=,]+
 
 Examples:
 
--  "" (not stratified)
+- Not stratified:: 
+  
+    ""
 
--  ::
+- Stratified::
 
-      "genusSpecies=Homo
-       sapiens;developmentStage=adult;organ=kidney,blood;libraryConstructionApproach=10X
-       v2 sequencing\n
-       genusSpecies=Mus
-       musculus;developmentStage=adolescent;organ=pancreas;libraryConstructionApproach=10X
-       v2 sequencing,Smart-seq2"
+    "genusSpecies=Homo sapiens;developmentStage=adult;organ=kidney,blood;libraryConstructionApproach=10X v2 sequencing\n
+    genusSpecies=Mus musculus;developmentStage=adolescent;organ=pancreas;libraryConstructionApproach=Smart-seq2\n
+    genusSpecies=Mus musculus;developmentStage=adolescent;organ=pancreas;libraryConstructionApproach=10X v2 sequencing"
 
--  ::
+- An equivalent, but less verbose stratification, using a comma to factor the
+  common parts::
 
-       "genusSpecies=Homo
-       sapiens;developmentStage=adult;organ=kidney,blood;libraryConstructionApproach=10X
-       v2 sequencing\n
-       genusSpecies=Mus
-       musculus;developmentStage=adolescent;organ=pancreas;libraryConstructionApproach=Smart-seq2\n
-       genusSpecies=Mus
-       musculus;developmentStage=adolescent;organ=pancreas;libraryConstructionApproach=10X
-       v2 sequencing" (equivalent to the previous example)
+    "genusSpecies=Homo sapiens;developmentStage=adult;organ=kidney,blood;libraryConstructionApproach=10X v2 sequencing\n
+    genusSpecies=Mus musculus;developmentStage=adolescent;organ=pancreas;libraryConstructionApproach=10X v2 sequencing,Smart-seq2"
+
 
 There can be more than one matrix file per stratum and more than one stratum
 per matrix file.
@@ -1251,43 +1197,42 @@ but instead directly refer to biomaterial entities like
 ``specimen_from_organism``, ``cell_line`` or ``organoid`` as its input,
 skipping the sequence files and any intermediate matrices.
 
-Consequently, the Azul indexer extends its definition of *sample* as the nearest
-biomaterial ancestor of a sequence file that is not a cell suspension to also
-include biomaterials linked directly to such an approximate ``process`` entity.
+Consequently, the Azul indexer extends its definition of *sample* as the
+nearest biomaterial ancestor of a sequence file that is not a cell suspension
+to also include biomaterials linked directly to such an approximate
+``process`` entity.
 
 Azul previously defined *sequencing input* as any input biomaterial to a
 process with a sequencing protocol. Usually that is a cell suspension, but it
 could also be liquid specimen like a drop of blood. The previous definition of
 *sequencing input* matches input biomaterials to the approximate CGM
 ``process`` entity because that process refers to a ``sequencing_protocol``
-entity. The approximate CGM subgraph is likely to elide any cell
-suspensions and it may not be known if a specimen was used directly as
-sequencing input, either. Azul therefore excludes from the definition of
-``sequencing input`` any inputs to an approximate ``process`` entity.
+entity. The approximate CGM subgraph is likely to elide any cell suspensions
+and it may not be known if a specimen was used directly as sequencing input,
+either. Azul therefore excludes from the definition of ``sequencing input``
+any inputs to an approximate ``process`` entity.
 
 If information is available about the protocols used in the experiment
 yielding the CGMs, that information is captured in protocol entities such as
-``sequencing_protocol`` or ``library_preparation_protocol`` and those
-protocol entities are linked to the approximate ``process`` entity.
-
+``sequencing_protocol`` or ``library_preparation_protocol`` and those protocol
+entities are linked to the approximate ``process`` entity.
 
 The following schemas have been augmented for the purpose of capturing
 information about CGMs.
 
-  - the ``analysis_file`` schema has a ``matrix_cell_count`` property to
-    capture the exact number of cells in the matrix
+- the ``analysis_file`` schema has a ``matrix_cell_count`` property to capture
+  the exact number of cells in the matrix
 
-  - the ``file_core`` schema, and therefore every ``…_file`` schema 
-    that uses it has a ``file_source`` enum property for capturing  the
-    specific source of the file e.g. ``DCP``, ``Contributor``, ``GEO``,
-    ``Publication`` etc. This property serves the same purpose as the
-    ``file_core.provenance.submitter_id`` in ``supplementary_files``
-    describing CGM in the deprecated mechanism (`Describing CGMs as
-    supplementary files`_)
+- the ``file_core`` schema, and therefore every ``…_file`` schema  that uses
+  it has a ``file_source`` enum property for capturing  the specific source of
+  the file e.g. ``DCP``, ``Contributor``, ``GEO``, ``Publication`` etc. This
+  property serves the same purpose as the
+  ``file_core.provenance.submitter_id`` in ``supplementary_files`` describing
+  CGM in the deprecated mechanism (`Describing CGMs as supplementary files`_)
 
-  - the ``analysis_protocol`` contains an optional ``matrix`` module schema
-    containing the properties ``data_normalization_methods`` and 
-    ``derivation_process`` 
+- the ``analysis_protocol`` contains an optional ``matrix`` module schema
+  containing the properties ``data_normalization_methods`` and 
+  ``derivation_process`` 
 
 Traversing the approximate CGM subgraphs, the Azul indexer infers a
 stratification tree of exactly the same structure as the one it derives from
@@ -1331,13 +1276,13 @@ stitches these three levels of subgraphs together.
 Project level matrix files are described by an ``analysis_file`` entity with
 the following properties:
 
--  The ``analysis_file.provenance.submitter_id`` field is set to
-   ``e67aaabe-93ea-564a-aa66-31bc0857b707``. This UUIDv5 was generated using
-   the same namespace UUID as for `Contributor-generated matrices (CGMs)`_ and
-   the name ``dcp2``.
+- The ``analysis_file.provenance.submitter_id`` field is set to
+  ``e67aaabe-93ea-564a-aa66-31bc0857b707``. This UUIDv5 was generated using
+  the same namespace UUID as for `Contributor-generated matrices (CGMs)`_ and
+  the name ``dcp2``.
 
--  The ``analysis_file.file_core.content_description`` field of both
-   intermediate and project-level matrices is set to::
+- The ``analysis_file.file_core.content_description`` field of both
+  intermediate and project-level matrices is set to::
 
        {
            "text": "DCP/2-generated matrix",
@@ -1345,14 +1290,14 @@ the following properties:
            "ontology_label": "Count Matrix"
        }
 
--  The ``analysis_file`` entities are linked to inputs via
-   ``analysis_process`` entities.
+- The ``analysis_file`` entities are linked to inputs via ``analysis_process``
+  entities.
 
--  Each ``analysis_process`` is described by an ``analysis_protocol``
+- Each ``analysis_process`` is described by an ``analysis_protocol``
 
--  The ``analysis_protocol.protocol_core.protocol_id`` will be
-   ``optimus_post_processing_v1.0.0`` for stratified, project-level
-   matrices and ``optimus_v1.0.0`` for the intermediate ones
+- The ``analysis_protocol.protocol_core.protocol_id`` will be
+  ``optimus_post_processing_v1.0.0`` for stratified, project-level matrices
+  and ``optimus_v1.0.0`` for the intermediate ones
 
 Any intermediate matrices created during the processing are described as
 ``analysis_file``, but the ``analysis_file.provenance.submitter_id`` property
@@ -1368,7 +1313,7 @@ is omitted.
 DCP/1-generated matrices
 ------------------------
 
--  The ``supplementary_file.provenance.submitter_id`` field is set to
-   ``c9efbb15-c50c-5796-8d15-35e9e1219dc5``. This UUIDv5 was generated using
-   the same namespace UUID as for `Contributor-generated matrices (CGMs)`_ and
-   the name ``dcp1 matrix service``.
+The ``supplementary_file.provenance.submitter_id`` field is set to
+``c9efbb15-c50c-5796-8d15-35e9e1219dc5``. This UUIDv5 was generated using the
+same namespace UUID as for `Contributor-generated matrices (CGMs)`_ and the
+name ``dcp1 matrix service``.
