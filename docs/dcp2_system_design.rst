@@ -574,17 +574,17 @@ using regular expressions or by splitting on underscore, and so that a
 lexicographical sorting reflects both the hierarchical relationship
 between datasets and snapshots as well as the time they were created. ::
 
-    dataset_name = "hca\_" , deployment , "_" , creation_date , ["_" ,
-    qualifier]
+    dataset_name = "hca_" , deployment , "_" , creation_date , ["_" , qualifier]
 
-    snapshot_name = dataset_name , "_", [project_id], "__" , creation_date ,
-    ["_" , qualifier]
+    snapshot_name = dataset_name , "_", [project_id], "__" , creation_date , ["_" , qualifier]
 
 .. _EBNF: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
 
-Note that snapshots have two dates in their name. The three consecutive
-underscores are not a typo, they exist to facilitate snapshot tiling for
-implementing controlled access in the future. ::
+Note that snapshots names contain two dates: one denotes the creation of the
+dataset, the other that of the snapshot. The two consecutive underscores are
+not a typo, they exist to facilitate access controls in the future. If
+``project_id`` is omitted, there will be three consecutive underscores in the
+name. ::
 
     creation_date = year , month , day
 
@@ -600,19 +600,21 @@ implementing controlled access in the future. ::
 
     project_id = [0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}
 
-The following regex should be used to validate dataset names::
+The following regex can be used to validate dataset names::
 
     ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,13})?$
 
-To validate snapshots (line break added for legibility)::
+To validate snapshots (line breaks added for legibility)::
 
     ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,13})?
-    ___(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]*)?$
+    _([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})?
+    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,13}))?$
 
-To validate either (line break added for legibility)::
+To validate either (line breaks added for legibility)::
 
     ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,13})?
-    (___(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,13})?)?$
+    (?:_([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})?
+    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,13}))?)?$
 
 The longest possible snapshot name in this scheme is 97 characters::
 
