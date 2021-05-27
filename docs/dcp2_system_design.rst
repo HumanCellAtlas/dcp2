@@ -239,11 +239,11 @@ in that table are
 - ``project_id`` which is a foreign key (FK) into the ``project`` table,
 
 - and a ``links_id`` PK column. A ``links_id`` identifies a subgraph. For new
-  projects this is a newly allocated UUID identifying each ``links.json``
-  file. For projects imported from the DSS this is the UUID of each copied
-  bundle. This is done to provide idempotence (ability to rerun the import
-  without having to clear the TDR tables) and provenance (ability to trace
-  data back from TDR to DSS).
+  projects this is a newly allocated UUID identifying each subgraph. For
+  projects imported from the DSS this is the UUID of each copied bundle. This
+  is done to provide idempotence (ability to rerun the import without having
+  to clear the TDR tables) and provenance (ability to trace data back from TDR
+  to DSS).
 
 - There is also a ``version`` PK column, a BQ TIMESTAMP. An update to a
   subgraph manifests as a new row. The new row has the same value in
@@ -309,7 +309,7 @@ follows:
         UUID. Pick the row with the highest version.
 
     ii. read the ``inputs``, ``outputs`` and ``protocols`` properties (they're
-        all lists). 
+        all lists).
 
         For each input, output and protocol, extract the schema type and
         entity ID. Query the TDR table that corresponds to the schema type and
@@ -326,7 +326,7 @@ Subgraph stitching
 ~~~~~~~~~~~~~~~~~~
 
 |nn| One architectural point of contention in DCP/1 was the fact that analysis
-bundles included all the meta(data) from the input bundle. This redundancy was
+bundles included all the (meta)data from the input bundle. This redundancy was
 one of the reasons the design of the metadata update mechanism became so
 complicated and was never finished. |ne|
 
@@ -453,7 +453,7 @@ mapping between the two. Similarly, instead of allocating a random UUIDv4 for
 the descriptor ``file_id`` one could also derive a UUIDv5 from the SHA-1 or
 SHA-256 hashes of the data file's content.
 
-.. [#] 
+.. [#]
    If a file is referenced by multiple bundles using different file names, the
    DSS adapter stages multiple objects with the same content. This case occurs
    in the wild, but is of negligible impact (< 1% in volume, zarr store
@@ -503,7 +503,7 @@ files to an ``analysis_process`` in the ``links`` table (`metadata-schema
 Naming datasets and snapshots
 -----------------------------
 
-|nn| 
+|nn|
 
 This section contains specific details that anticipate that the DCP/2
 will soon need to support multiple snapshots of per catalog, at least one per
@@ -528,7 +528,7 @@ snapshots:
    labelling, sorting and filtering are available when listing datasets and
    snapshots using the TDR API. Additionally, IDs are hard to read to the
    human eye, and hard to distinguish visually, so as long as we manually
-   confer them between teams, names are preferred. 
+   confer them between teams, names are preferred.
 
 |ne|
 
@@ -627,8 +627,8 @@ validated prior to the actual import. Using a GCS bucket for staging areas
 makes it possible to utilize GCP's cheap copies for the DSS adapter. |ne|
 
 One bucket may contain multiple areas, from the same source or from a range of
-sources. A staging area may contain meta(data) from multiple HCA projects, or
-just one. If a staging area contains meta(data) for only one project, its
+sources. A staging area may contain (meta)data from multiple HCA projects, or
+just one. If a staging area contains (meta)data for only one project, its
 ``prefix`` must end in ``{project_id}/``. There may be more than one staging
 area for a given HCA project (for different deployments, for example) but each
 one should be complete (cover the entire project) and no two staging areas for
@@ -646,16 +646,58 @@ Object names given in this section are relative to the staging area. To
 produce the complete ``gs://…`` URI of a particular object in the staging
 area, append the object's name to the staging area URI. [#]_
 
+
+Staging area properties
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Every staging area must include an object named ``staging_area.json`` in the
+root directory. It contains a JSON object that defines the *staging area
+properties* i.e. traits that apply to the staging area as a whole. Absence of
+this object must result in an immediate abort of the importer with an error
+message as defined in `Import errors`_. Legacy staging areas must be
+retrofitted with this object before they can be imported again.
+
+|nn| In this case, retrofitting seemed easier than defining defaults for each
+and every staging area property going forward. Similarly, as we add staging
+area  properties in the future, legacy staging areas would need to be
+retrofitted again with those new properties, but I feel it's a good thing that
+staging area sources are forced to make a concsious choice about the value of
+each new staging area property before their staging area can be imported
+again. |ne|
+
+The contents of ``staging_area.json`` must match the following schema::
+
+   {
+     "$schema": "https://json-schema.org/draft/2019-09/schema",
+     "properties": {
+       "is_delta": {
+         "type": "boolean"
+       }
+     },
+     "required": [
+       "is_delta"
+     ],
+     "additionalProperties": false
+   }
+
+The ``is_delta`` property indicates whether a staging contains exclusively
+altered (added, deleted or updated) (meta)data. The specifics are defined in
+`Altering data and metadata`_ and `Types of data and metadata alterations`_.
+
+
+Object naming
+~~~~~~~~~~~~~
+
 There are four object naming schemes, one for data files, one for file
-descriptors, one for metadata files and one for ``links.json`` files.
+descriptors, one for metadata files and one for subgraphs.
 
 - The object name of a metadata entity is::
 
-    metadata/{entity_type}/{entity_id}_{version}.json
+    metadata/{entity_type}/{entity_id}_{version}.json[.remove]
 
   where
 
-  ``entity_type``  
+  ``entity_type``
     is the `HCA schema entity type`_ such as ``cell_suspension``.
 
   ``entity_id``
@@ -678,16 +720,50 @@ descriptors, one for metadata files and one for ``links.json`` files.
     DSS version of the metadata file, converting it to this restricted ISO
     syntax.
 
+   Entity objects that share a given ``entity_id`` in a staging area must all
+   have the same ``entity_type``. This precludes assigning the same
+   ``entity_id`` to entities of different types, but allows several versions
+   of one entity to coexist in a non-delta staging area. A delta staging area,
+   on the other hand, must contain at most one object with a given
+   ``entity_id``, and therefore only one version of that entity.
+   
+
+   The ``.remove`` suffix is used to request the removal of an entity. It can
+   only be used in staging areas that have the ``is_delta`` property set to
+   ``true``. If an object has this suffix, it must have a size of zero bytes.
+
 .. _HCA schema entity type: https://github.com/HumanCellAtlas/metadata-schema/tree/master/json_schema/type
 
 - The object name of a file descriptor is::
 
-    descriptors/{entity_type}/{entity_id}_{version}.json
+    descriptors/{entity_type}/{entity_id}_{version}.json[.remove|.delete]
 
   where ``entity_type``, ``entity_id`` and ``version`` have the same meaning
   as for metadata entities, except that the value of ``entity_type`` has to
   end in ``_file``. File descriptors are JSON documents and are described in
   `Generic file metadata`_.
+
+   The ``.remove`` suffix is used to request the removal of a data file. It
+   can only be used in staging areas that have the ``is_delta`` property set
+   to ``true``. If an object has this suffix, it must have a size of zero
+   bytes.
+
+   The ``.delete`` suffix is used to request the deletion of a data file. It
+   can only be used in staging areas that have the ``is_delta`` property set
+   to ``true``. If an object has this suffix, it must have a size of zero
+   bytes.
+
+   For details on deletions and removals see `Types of data and metadata
+   alterations`_.
+
+   A staging area may only contain exactly one descriptor object with a given
+   ``entity_id``. This precludes more than one version of any descriptor or
+   assigning the same ``entity_id`` to descriptors for file entities of
+   different types.
+
+   Descriptor objects that share a given ``entity_id`` in a staging area must
+   all have the same ``entity_type``. A delta staging area may contain at most
+   one object with a given ``entity_id``.
 
 - The object name of a data file is::
 
@@ -695,17 +771,18 @@ descriptors, one for metadata files and one for ``links.json`` files.
 
   where
 
-  ``file_name``  
+  ``file_name``
     is the ``file_name`` property from the file descriptor object for this
     data file.
 
-- The object name for ``links.json`` files is::
 
-    links/{links_id}_{version}_{project_id}.json
+- The object name for subgraphs is::
+
+    links/{links_id}_{version}_{project_id}.json[.remove]
 
   where
 
-  ``links_id`` 
+  ``links_id``
     is a UUID that uniquely identifies the subgraph. The DSS adapter uses the
     bundle UUID.
 
@@ -721,6 +798,22 @@ descriptors, one for metadata files and one for ``links.json`` files.
     subgraph objects by their ID without knowing the project ID. The importer
     must record an error if it detects more than one object with the same
     ``links/{links_id}_{version}_`` prefix.
+
+   The ``.remove`` suffix is used to request the removal of a subgraph. It can
+   only be used in staging areas that have the ``is_delta`` property set to
+   ``true``. If an object has this suffix, it must have a size of zero bytes.
+   See `Types of data and metadata alterations`_ for details.
+
+   A staging area may only contain exactly one subgraph object with a given
+   ``links_id``. This precludes more than one version of any subgraph or
+   using the same ``links_id`` in subgraphs for different projects.
+
+   Subgraph objects that share a given ``links_id`` in a staging area must all
+   have the same ``project_id``. This precludes assigning the same
+   ``links_id`` to subgraphs for different projects, but allows several
+   versions of one subgraph to coexist in a non-delta staging area. A delta
+   staging area, on the other hand, must contain at most one object with a
+   given ``links_id``, and therefore only one version of that subgraph.
 
 .. [#]
    The staging area URI is guaranteed to end in a slash.
@@ -935,6 +1028,414 @@ import tool with be requested manually in #ingest-to-tdr-shared Slack channel
 
 
 
+DCP data releases
+=================
+
+A data release of the DCP consists of a set of disjunctive TDR snapshots that
+provides a coherent and immutable view of the contents of the DCP at the time
+the data release is published.
+
+Some of those snapshots may contain (meta)data for exactly one HCA project while
+other snapshots may contain (meta)data for more than one HCA project.
+
+**Completeness**: Each snapshot in the release must be complete; that is, every
+entity referenced by every subgraph in the snapshot must also be present in that
+same snapshot. Expressed in terms of the TDR schema this means that for every
+row in the ``links`` table of the snapshot, and any reference *u* to an entity
+of type *T* by the JSON structure in the ``contents`` column of that row, there
+must be exactly one row index *i* in table *T* of that snapshot for which
+*T[i].T_id = u*. Similarly, for every row index *j* in the ``links`` table of
+the snapshot, there must be exactly one row index *i* in the ``project`` table
+of that snapshot for which *project[i].project_id = links[j].project_id*.
+
+**Disjunctivity**: No metadata entity may be included in more than one of the
+snapshots that make up the data release. Expressed in terms of the TDR schema
+this means that for every row index *i* in any table *T* of any snapshot *S1* in
+the release, there is no row index *j* in table *T* of any other snapshot *S2*
+in the release for which *S1.T[i].T_id = S2.T[j].T_id*.
+
+Note that the above two constraints specifically preclude the case of one
+project occurring in more than one snapshot, because it would require either two
+``project`` rows with the same ``project_id``, violating the disjunctivity
+constraint, or omitting one of those rows, violating the completeness
+constraint.
+
+Before a data release is published i.e., made accessible to persons outside of
+the DCP, it has to be prepared. During preparation, the set of snapshots that
+make up the release may change. Except when a snapshot is first added to the
+release, adding a snapshot typically means removing a superseded snapshot from
+the data release, all the while maintaining the completeness and disjunctivity
+constraints.
+
+Once a data release is published, the snapshots that make up the release may
+never be deleted. Superseded snapshots that were removed from the release prior
+to publishing should be deleted.
+
+
+TDR datasets and data releases
+------------------------------
+
+|nn| The relationship between data releases and TDR datasets is intentionally
+left unspecified. Most of the time, the preparation of a new release should not
+require the creation of a new TDR dataset. |ne|
+
+The names of the TDR snapshots in a particular data release should carry a
+qualifier (see `Naming datasets and snapshots`_). The qualifier should be the
+name of the Azul catalog corresponding to the release, as described in `Azul
+catalogs and data releases`_
+
+
+Azul catalogs and data releases
+-------------------------------
+
+There is one Azul catalog per data release. While a data release is in
+preparation, the Data Browser hides the corresponding Azul catalog. A hidden
+catalog can still be viewed by pasting its name into the current URL in the
+browser's address bar. Each catalog incurs considerable cost for storage,
+compute and engineering hours. When Azul adds new features it must make them
+available for all catalogs. The more catalogs there are to be maintained, the
+more complex their maintenance gets. Consequently, Azul does not maintain
+catalogs for the long term. Typically, there will only be two catalogs in Azul
+at any point of time: the one for the most recently published data release, and
+the one for the data release currently being prepared.
+
+
+Altering data and metadata
+--------------------------
+
+When a data release first enters the preparation phase, it is identical to the
+data release that precedes it. In other words, it is made up of the same set of
+snapshots as the previous data release. After that, and until the release is
+published, the (meta)data in the data release being prepared is subject to
+*alterations*. Alterations to (meta)data should generally be made in the form of
+delta staging areas. A delta staging area has the ``is_delta`` property set to
+``true``. The layout of delta staging areas and the rules for importing them
+differ slightly from those for non-delta staging areas i.e. those with a
+``is_delta`` value of ``false``. Only delta staging areas may indicate the
+removal of (meta)data or the deletion of data, non-delta staging areas must not.
+
+Writing an entity object and a corresponding descriptor object to a staging area
+with the same content as that of the highest version of that entity already in
+TDR while using a higher version in the name of that entity or descriptor object
+is referred to as a *redundant version*. Delta staging areas must not contain
+redundant versions of (meta)data.
+
+|nn| These are the main purposes of the ``is_delta`` property: 1) to alert the
+importer to look for deletion/removal markers and 2) to explicitly prevent the
+redundant work of importing unaltered (meta)data. The reason that non-delta
+staging areas may contain updates is for backwards compatibility: The DCP
+already utilized this functionality before this section of the specification was
+written. |ne|
+
+|nn| It may be tempting to reuse an existing staging area after it has been 
+imported so as to avoid having to repopulate a completely new staging area for
+the next import. For non-delta staging areas this can be a good strategy. For
+delta staging areas it usually isn't because delta staging areas can only
+contain one version of anything and can't contain any unchanged (meta)data. The
+easiest way to satisfy that constraint is to create a completely new staging
+area for every import. It may also help in debugging to leave previously
+imported staging areas in the staging bucket by including the creation time or
+the target DCP release name in the staging area path. These decisions are left
+to the staging area source to make. |ne|
+
+A staging area may only be modified in between importer invocations, not while
+the importer is running. Coordination of access to a staging area occurs out of
+band e.g. via Slack or a ticketing system.
+
+
+Types of data and metadata alterations
+--------------------------------------
+
+This specification distinguishes between several supported types of alterations.
+The subsections below describe each one of those types in detail and specify the
+steps to be performed by a staging area source in order to apply that
+alteration.
+
+Until a (delta) staging area is imported, alterations can be reverted simply by
+undoing the steps taken to add the alteration. For example, if a delta staging
+area adds a cell suspension to a project, reverting the addition prior to an
+import simply involves deleting the cell suspension entity object and any
+subgraphs that reference it. Reverting the addition after the staging area was
+imported means creating a new delta staging area with a removal marker object
+for the cell suspension entity and updated subgraph objects that omit any
+reference to the cell suspension.
+
+For alterations of metadata entities, subgraphs, descriptors and data files, we
+define two copies: the altered copy and the original. The *altered* copy is the
+one contained in the (delta) staging area about to be imported. The *original*
+is the copy that was most recently imported into TDR, the one that's currently
+present in the TDR dataset. Under this definition, a deletion or removal marker
+object is considerd an altered copy. It is insignificant if the original was
+imported from a staging area at the same URI as the one containing the altered
+copy, or a different URI.
+
+We further differentiate between removals and deletions. Data files can be
+deleted or removed, subgraphs and metadata entities can only be removed. A
+removed data file, subgraph or metadata entity disappears from subsequently
+created snapshots but remains present in previously created snapshots. A deleted
+data file is both removed from subsequently created snapshots **and** erased
+physically from storage, references to it in previously created snapshots become
+invalid and requesting the data file's content results in an error.
+
+
+Update an entity
+~~~~~~~~~~~~~~~~
+
+Write the updated entity document to an object in the ``metadata`` directory of
+the staging area. The name of that object must have the same ``entity_type`` and
+``entity_id`` as the original and a strictly higher ``version``.
+
+
+Update a data file
+~~~~~~~~~~~~~~~~~~
+
+1. Write the updated data file to an object in the ``data`` directory of the
+   staging area, using the same relative path as the original data file.
+
+2. Write the updated descriptor to an object in the ``descriptors`` directory of
+   the staging area. The name of the descriptor object must have the same
+   ``entity_type`` and ``entity_id`` as the original, and a strictly higher
+   ``version``. The ``file_id`` property of the descriptor document must be the
+   same as that of the original, and the ``file_version`` property must be
+   strictly higher. The ``file_name`` property must have the same value as in
+   the original. Note that the ``file_id``property of the descriptor document is
+   independent from the column of the same name in TDR ``…_file`` tables and
+   that this section only applies to the former.
+
+   If the staging area has the `is_delta`` property set to ``true`` (or
+   ``false``), the ``sha1`` and ``sha256`` properties must (or should) differ
+   from their respective values in the orginal. [#]_ In other words, redundant
+   updates are not allowed in delta staging areas, and not recommended in
+   non-delta staging areas.
+
+   Similarly, if the ``size`` property is different, the ``sha1`` and ``sha256``
+   properties must differ between original and update. [#]_ The ``content-type``
+   property may have the same value or a different one. For updating *only* the
+   content type of a file see `Update the content type of a data file`_.
+
+3. Update the entity describing the data file, as specified in `Update an
+   entity`_. Do so even if the entity document itself did not change. This is
+   necessary so that the ``entity_type``, ``entity_id`` and ``version`` fields
+   in the name of the descriptor object match those in the name of the entity
+   object.
+
+Renaming data files is currently not supported.
+
+|nn| Renaming a data file could result in an unreferenced TDR Firestore entry
+that should be garbage collected after making sure that 1) it is not the most
+recent version and 2) that no snapshots refer to it. Since the badly named
+``file_name`` descriptor property is actually a relative path, we will define
+*renaming* of a data file to be a change to any component of that path. This
+includes moving a file to a different directory, and could result in empty
+Firestore directories that must be garbage collected as well. |ne|
+
+.. [#]
+   It would be difficult to specify a similar constraint for the ``s3_etag``
+   property of the file descriptor, simply because a multi-part S3 ETAG hash
+   is ambiguous: there can more than one such hash for any given input.
+
+.. [#]
+   This is assuming that the probability of two files of different sizes
+   having the same hash is infinitesimally small, except for ``crc32c``, which
+   has a significantly higher probability of collisions
+
+
+Update the content type of a data file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Write the updated descriptor to an object in the ``descriptors`` directory
+   of the staging area. The name of the descriptor object must have the same
+   ``entity_type`` and ``entity_id`` as the original and a strictly higher
+   ``version``. The ``file_id`` and ``file_version`` properties of the updated
+   descriptor must be the same as in the previous version. Note that the
+   ``file_id``property of the descriptor document is independent from the column
+   of the same name in TDR ``…_file`` tables and that this section only applies
+   to the former.
+
+2. Update the entity describing the data file, as specified in `Update an
+   entity`_. Do so even if the entity document itself did not change. This is
+   necessary so that the ``entity_type``, ``entity_id`` and ``version`` fields
+   in the name of the descriptor object match those in the name of the
+   object containing the entity that describes the data file.
+
+
+Update a subgraph
+~~~~~~~~~~~~~~~~~
+
+Write the updated subgraph to an object in the ``links`` directory of the
+staging area. The name of the subgraph object must have the same ``links_id``
+and ``project_id`` as the original and a strictly higher ``version``.
+
+Note that it is uncommon for a subgraph to change without entities being added
+or removed. The scenarios during which it occurs naturally include the
+reordering of entities in the subgraph or migrating the subgraph document to a
+newer schema version.
+
+
+Add an entity
+~~~~~~~~~~~~~
+
+Write the entity document to an object in the ``metadata`` directory of the
+staging area. The ``entity_id`` in the name of the object must be different
+from the ``entity_id`` column of any row in any table of the TDR dataset the
+staging is imported into.
+
+This type of update creates an orphaned entity so it should only be used as
+part of other updates, as described in `Add a subgraph`_, `Add a project`_ or
+`Add an entity to existing subgraphs`_.
+
+
+Add a data file
+~~~~~~~~~~~~~~~
+
+1. Write the data file to an object in the ``data`` directory of the staging
+   area.
+
+2. Write the descriptor to an object in the ``descriptors`` directory of the
+   staging area. The ``file_uuid`` property of the descriptor must be
+   different from any ``file_uuid`` property of the JSON document in the
+   ``descriptor`` column of any row in any ``…_file`` table in the TDR dataset
+   the staging area will be imported into.
+
+   The ``entity_id`` and ``version`` fields in the name of the descriptor must
+   match those in the name of the object created in the next step.
+
+3. Add the entity describing the data file as defined in `Add an entity_`.
+
+This type of update creates an orphaned data file so it should only be used as
+part of other updates, as described in `Add a subgraph`_, `Add a project`_ or
+`Add an entity to existing subgraphs`_.
+
+
+Add a subgraph
+~~~~~~~~~~~~~~
+
+1. Add any entities introduced by the subgraph as described in `Add an
+   entity`_. If the subgraph also refers to entities that were previously
+   imported, those entities should not be written to the staging area.
+
+2. Write the subgraph to an object in the ``links`` directory of the staging
+   area. The ``links_id`` field in the name of that object must be different
+   from the value of the ``links_id`` column in any row of the ``links`` table
+   of the TDR dataset the staging are is imported into.
+
+
+Add a project
+~~~~~~~~~~~~~
+
+1. Add the ``project`` entity as described in `Add an entity`_
+
+2. Add all other entities belonging to the project as described in `Add an
+   entity`_
+
+3. Add the subgraphs belonging to the project as described in `Add a
+   subgraph`_
+
+
+Add an entity to existing subgraphs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Add the entity as described in `Add an entity`_
+
+2. Update the subgraphs that reference the entity as described in `Update a
+   subgraph`_
+
+
+Add a data file to existing subgraphs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Add the data file as described in `Add a data file`_
+
+2. Update the subgraphs that reference the data file as described in `Update a
+   subgraph`_
+
+
+Remove an entity
+~~~~~~~~~~~~~~~~
+
+1. Make sure the staging area property ``is_delta`` is ``true``.
+
+2. Create an empty object in the ``metadata`` directory of the staging area.
+   The ``entity_type`` and ``entity_id`` fields in the object name must be the
+   same as those in the name of the original (the entity to be deleted), the
+   ``version`` field must be strictly higher and the name must end in
+   ``.json.remove`` instead of just ``.json``.
+
+3. If the removed entity is of type ``project``, remove all subgraphs in that
+   project. Otherwise, update the subgraphs referencing the removed entity as
+   described in `Update a subgraph`_
+
+A removed entity must remain in all snapshots that are part of already
+published data releases but must be absent from any subsequently created
+snapshot in the data release currently being prepared.
+
+|nn| This means that the corresponding row cannot be removed from the TDR
+dataset, but instead has to be soft-deleted, so it is not included in
+subsequently created snapshots. This is a TDR implementation detail. |ne|
+
+
+Remove a data file
+~~~~~~~~~~~~~~~~~~
+
+1. Remove the entity describing the data file as described in `Remove an
+   entity`_.
+
+2. Create an empty object in the ``descriptors`` directory of the staging
+   area. The name of the object must have the same ``entity_type``, ``entity_id``
+   and ``version`` as the entity from the previous step and the name must end in
+   ``.json.remove`` instead of just ``.json``.
+
+A removed data file must remain in all snapshots that are part of already
+published data releases but must be absent from any subsequently created
+snapshot in the data release currently being prepared.
+
+
+Delete a data file
+~~~~~~~~~~~~~~~~~~
+
+Follow the steps in `Remove a data file` but use ``.json.delete`` at the end
+of the descriptor object name, instead of ``.json.remove``.
+
+The importer must ensure that any copies of the data file are physically
+deleted. The metadata entity describing the deleted data file remains in
+existing snapshots but attempts to download the data file from any snapshot
+yield in a 410 or 404 status response.
+
+
+Remove a subgraph
+~~~~~~~~~~~~~~~~~
+
+1. Make sure the ``is_delta`` staging area property is ``true``.
+
+
+2. Create an empty object in the ``links`` directory of the staging area. The
+   name of the object must have the same ``links_id`` as the subgraph to be
+   deleted, a strictly higher ``version`` and must end in ``.json.remove``
+   instead of just ``.json``.
+
+If the deleted subgraph is not part of any snapshot, this may leave
+unreferenced entity table rows in the TDR dataset. The importer must ensure
+that the entity tables in subsequently created snapshots do not contain any
+unreferenced rows. An entity is considered unreferenced if no subgraph
+references it. A subgraph is said to *reference* to an entity if the JSON
+document in the ``content`` column of the corresponding row in the ``links``
+table contains the ``entity_id`` of that entity.
+
+|nn| This assigns the onus of garbage collection squarely to the importer. We
+do this because it would be impossible for a staging area source to
+authoritatively decide which entities become unreferenced by a removed
+subgraph. Removing unreferenced entities is not trivial. I can think of two
+possible approaches: reference counting or mark-and-sweep, just like with Java
+garbage collection. Reference counting means maintaining an additional column
+in each entity table. The value of that column in any row would be equal to
+the number of subgraphs that reference the entity in that row. Mark-and-sweep
+would involve running a query against the ``links`` table to enumerate each
+referenced entity, iterating over the result and marking each entity table
+row and finally soft-deleting any unmarked rows. |ne|
+
+
+
+
 Project-level matrices
 ======================
 
@@ -988,7 +1489,7 @@ download that archive and extract it locally.
 The interim solution stores the contributor-generated matrices as data files
 in the TDR and describes them with a `file descriptor <Generic file
 metadata_>`_, a ``supplementary_file`` entity and a ``supplementary_link``
-entry in a ``links.json``. There will be one subgraph (and therefore one
+entry in a subgraph. There will be one subgraph (and therefore one
 ``links.json`` document) per HCA project. If the contributor provided multiple
 matrices stratified by, say, species and organ, the per-project subgraph will
 contain a ``supplementary_file`` and a ``supplementary_link`` for each such
@@ -1061,19 +1562,19 @@ EBNF/Regex, starting at the ``strata`` non-terminal::
     strata = "" | stratum , { "\n" , stratum }
 
     stratum = point , { ";" , point }
-    
+
     point = dimension , "=" , values
-    
+
     dimension = "genusSpecies" | "organ" | "developmentStage" | "libraryConstructionApproach"
-    
+
     values = value , { "," , value }
-    
+
     value = [^\n;=,]+
 
 Examples:
 
-- Not stratified:: 
-  
+- Not stratified::
+
     ""
 
 - Stratified::
@@ -1231,8 +1732,8 @@ information about CGMs.
   CGM in the deprecated mechanism (`Describing CGMs as supplementary files`_)
 
 - the ``analysis_protocol`` contains an optional ``matrix`` module schema
-  containing the properties ``data_normalization_methods`` and 
-  ``derivation_process`` 
+  containing the properties ``data_normalization_methods`` and
+  ``derivation_process``
 
 Traversing the approximate CGM subgraphs, the Azul indexer infers a
 stratification tree of exactly the same structure as the one it derives from
@@ -1242,7 +1743,7 @@ mechanism (`Describing CGMs as supplementary files`_). The Data Browser
 exposes that tree in the same manner on the project details page. The inferral
 algorithm is identical to the one used for ``DCP/2-generated matrices`` with
 the one distinction that the subgraphs in the latter are exact, not
-approximate. 
+approximate.
 
 Additionally, the CGM analysis files are listed on the Files tab of the Data
 Browser.
