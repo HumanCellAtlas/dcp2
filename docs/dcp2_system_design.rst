@@ -1453,7 +1453,10 @@ studied in those experiments.
 A matrix from a contributor or any other source external to the DCP is refered
 to as a *contributor-generated* matrix. This definition includes supporting
 files such as those containing cell type annotations, for example, that
-contributors may provide along with the actual matrices.
+contributors may provide along with the actual matrices. These matrices should
+be interpreted with caution: the DCP takes no responsibility for what, if any,
+batch correction or normalisation techniques have been used as they have been
+done directly by the data contributor.
 
 
 Contributor-generated matrices (CGMs)
