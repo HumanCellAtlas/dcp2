@@ -1,3 +1,6 @@
+.. sectnum::
+   :depth: 3
+   :suffix: .
 
 .. role:: raw-html(raw)
    :format: html
