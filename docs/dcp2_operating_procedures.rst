@@ -1,3 +1,6 @@
+.. sectnum::
+   :depth: 3
+   :suffix: .
 
 .. role:: raw-html(raw)
    :format: html
@@ -12,11 +15,9 @@ DCP/2 Operating Procedures
 ==========================
 
 |nn| Text in a block quote (like this) is not normative. It was included
-for informational purposes only and does not bear on the implementation.
-|ne|
+for informational purposes only and does not bear on the implementation. |ne|
 
 .. contents::
-
 
 
 
@@ -24,14 +25,15 @@ for informational purposes only and does not bear on the implementation.
 Changing the HCA metadata schema
 ================================
 
-Changes to the HCA metadata schema, even seemingly minor ones, can have
-significant impact on the individual components of the DCP system. The DCP
-consortium therefore uses a review process that ensures all teams in the
-consortium approve of a schema change **before** it 
+The HCA metadata schema defines the shape of metadata documents being
+exchanged between components of the DCP/2. It therefore constitutes a
+de-facto contract between those components. The DCP consortium reviews schema
+changes collectively to ensure that all teams in the consortium approve of a
+schema change **before** it 
 
 - affects the master branch of the `metadata-schema`_ repository,
 
-- is published on `schema.humancellatlas.org`_, and
+- is published on `schema.humancellatlas.org`_, or
 
 - is used by metadata staged for import into the production instance of TDR
 
@@ -46,115 +48,150 @@ consortium approve of a schema change **before** it
 .. _DCP/2 system design: dcp2_system_design.rst
 
 
+Impact of Schema changes
+-------------------------
+
+Changes to the HCA metadata schema, including seemingly minor ones, can have
+significant impact on the individual components of the DCP system. Even the
+addition of a property can, in some case, require significant work in
+metadata consumers like the Data Browser, especially if those consumers are
+required to interpret the added property. It would be difficult to explicitly
+define the criteria for classifing schema changes by impact. Instead, the
+impact is determined individually for every schema change. Changes that are
+deemed of low impactare fast-tracked through a lighter-weight review process.
+
+
 Sizing schema changes
 ---------------------
 
-A *schema change* is a set of related modifications to one or more of the 
-JSONSchema documents in the `metadata-schema`_ repository. That set must be
-chosen carefully. If a schema change *can* be made smaller by excluding a
-particular change to a schema document without sacrificing the desired end-user
-value, it *should* be made smaller, so as to not overwhelm the reviewers with a
-mix of orthogonal concerns. On the other hand, the set of changes shoudn't be
-too small either: all schema document changes that are necessary to achieve the
-desired end-user value should be combined in one overall schema change. If
-certain end user value is achieved in a series of many small schema changes,
-reviewers will likely not be able to see the big picture until they review the
-changes at the end of that series at which point it may be too late to reverse
-course.
+A *schema change* is a carefully seleced set of related modifications to one
+or more of the JSONSchema documents in the `metadata-schema`_ repository. If
+a schema change *can* be made smaller by excluding a particular change to a
+schema document without sacrificing the desired end-user value, it *should*
+be made smaller, so as to not overwhelm the reviewers with a mix of
+orthogonal concerns. 
+
+On the other hand, the set of changes shoudn't be too small either: all schema
+document changes that are necessary to achieve the desired end-user value
+should be combined in one schema change. If certain end user value is
+achieved in a series of many small schema changes, reviewers will likely not
+be able to see the big picture until they review the changes at the end of
+that series, at which point it may be too late to reverse course.
 
 Some schema changes warrant an update to the `DCP/2 System Design`_
-specification. Whether they do or not is established during the review process
-of *pull requests* (PRs) against the `metadata-schema` and `schema-test-data`
-repositories. Specification updates are done as a PR against the `dcp2`_
-repository.
+specification. Whether they do or not is established collectively and early
+on during the review process.
+
+
+Responsiveness to submitter requirements
+----------------------------------------
+
+
+Schema changes are often motivated by the need to capture novel information
+about the experimental design, phenotypes or sample collection process as
+submitted by a participating laboratory, in a form that the current schema is
+not able to sufficiently capture. Participating labs often don't have the
+resources or tolerance for a prolonged submission process and are likely to
+walk away if it takes too long to incorporate their submission into the
+DCP/2.
+
+The DCP/2 therefore needs to balance the celerity with which it adopts schema
+changes on one hand against the effort needed to make all components
+compatible with those changes on the other. The earlier a proposed change
+faces scrutiny by the entire DCP/2 consortium, the better will the consortium
+be able to negotiate the right balance, simply because the change will not
+yet have permeated through the system, making it easier to make adujustments
+to the proposed schema changes.
+
+
+Review process overview
+-----------------------
+
+The process of reviewing schema changes utilizes Github's pull request
+(PR) feature. Every schema change begins with a PR against the `develop`
+branch of the `metadata-schema`_ repository. This is were the DCP/2
+consortium determines
+
+* the impact of the change
+
+* whether the schema change is `sized <Sizing schema changes>`_ correctly
+
+* whether the change requires updating the specification in the `dcp2`_ repository
+
+* whether it requires updating the test metadata in the `schema-test-data`_
+  repository for other components to code unit tests against
+
+If a change requires specification changes, the `metadata-schema`_ PR review is
+suspended and a PR is filed against the `dcp2`_ repository and reviewed there.
+Once that PR is approved, the `metadata-schema`_ PR is revised and reviewed
+again.
+
+Schema changes that are sized correctly and have negligible impact to other
+components, are considered adopted by the DCP/2 as soon as the PR against the
+`develop` branch is approved. No further reviews of PRs against other branches or
+repositories are required.
+
+Schema changes that are sized correctly, and that are of some impact to other
+components, may require more involved testing. There are two ways of testing
+schema changes: 
+
+A)  (Meta)data exhibiting the proposed changes are first staged and then
+    imported into the `dev` instance of TDR after which downstream components
+    use the resulting `dev` snapshot to test the code changes that are required
+    to support the schema change. The Ingest component can only populate
+    staging areas from its staging instance, so the `develop` PR must be
+    approved(under the provision that the schema change may need to be amended
+    by another PR) and the changes are promoted to the staging branch.
+
+B) (Meta)data exhibiting the proposed schema changes are committed to a feature
+    branch of the `schema-test-data`_ repository, and a PR is filed for that
+    branch. The `schema-test-data`_ repository can only populated using the
+    staging instance of the Ingest component, so the PR against the `develop`
+    branch of the `metadata-schema`_ repository must be approved (under the
+    condition that the schema change may need to be amended in another PR)
+    and the changes are promoted to the staging branch.
+
+The reviewers of a PR can request either testing strategy. Strategy A will
+likely be requested for for most changes with some impact on other components.
+
+In some cases a lab submission not only involves a schema change but also
+introduces a novel way of linking the metadata enties into subgraphs. In those
+cases, reviewers are likely to request testing strategies B. A request for
+either strategy should be reasonably motivated. Possible reasons include 
+
+- the need to not only review schema changes but also review how those changes
+  affect actual metadata documents
+
+- the need to test future, unrelated code changes against the test metadata, so
+  as to make sure that those future changes don't introduce regressions.
+  Especially graph changes fall into that category.
+
+Schema changes that are sized incorrectly need to be revised.
 
 
 Schema change authorship
 ------------------------
 
-Anyone can author a PR. The PRs for one schema change don't all need to be by
-the same author, as long as there are no competing and open PRs in the same
-repository and for the same schema change. One person *should* author the PRs
-against the `metadata-schema`_ and `dcp2`_ repositories. That person is referred
-to as the *schema change author*. The schema change author can delegate
-authorship of PRs to other members of the DCP consortium.
+Anyone can author a schema change. The PRs for one schema change don't all need
+to be by the same author, as long as there are no competing PRs pending in the
+same repository, for the same schema change. One person *should* author the PRs
+against the `metadata-schema`_ and `dcp2`_ repositories. That person is
+referred to as the *schema change author*. The schema change author can
+delegate authorship of PRs to other members of the DCP consortium.
 
 
-Schema change procedure
------------------------
+Pull request reviews
+--------------------
 
-The overall procedure for authoring and reviewing a schema change consists of
-the following steps:
-
-1)  If it is considered unnecessary to update the specification and a
-    specification update wasn't explicitly requested, proceed to step 4.
-
-2)  Prepare a PR against the `dcp2`_ repository, updating the `DCP/2 System
-    Design`_.
-
-3)  Initiate a `Pull request review`_ of your PR. Once the PR has been approved
-    by the DCP, move on to the next step. Don't merge the PR just yet.
-
-4)  Prepare a PR against the ``develop`` branch of the `metadata-schema`_
-    repository. It is OK to perform this step concurrently with the preceding
-    steps.
-
-5)  Initiate a `Pull request review`_ of your PR. Once the PR has been approved
-    by the DCP, move on to the next step. Don't merge the PR just yet.
-
-    Note that the above steps can be performed for several independent schema
-    changes in parallel.
-   
-6)  Merge the `metadata-schema`_ repository PR into the ``develop`` branch and
-    from there into the ``staging`` branch.
-
-7)  Prepare a PR against the `Test metadata`_ in the `schema-test-data`_
-    repository. Don't merge the PR just yet.
-
-8)  Initiate a `Pull request review`_ of your PR. Once the PR has been approved
-    by the DCP, move on to the next step. As part of the review, the Azul team
-    updates their unit tests to validate the updated test metadata. If a test
-    fails, they either improve the test or the team member reviewing the PR
-    requests the necessary changes to the test metadata.
-
-9)  Prepare a PR against the schema repository, targeting the master branch.
-
-10) Initiate a `Pull request review`_ of your PR. The review should be quick
-    because reviewers will already have seen the changes while reviewing the PR
-    against the ``develop`` branch. Reviewers should not request any substantial
-    changes at this stage unless last minute considerations absolutely require
-    it. Once the PR has been approved by the DCP, move on to the next step.
-
-11) Merge all PRs. You may squash and/or rebase a PR before merging it but that
-    should not affect the diff between the base and head commits of the PR
-    branch, except for housekeeping like resolving merge conflicts or adjusting
-    the host name of schema URLs in PRs against the `schema-test-data`_
-    repository. No semantic changes may be introduced to a PR after it has been
-    approved by the DCP. All such housekeeping should be done on the PR branch
-    prior to merging it.
-
-
-Test metadata
--------------
-
-Every change to the schemas in the `metadata-schema`_ repository must be
-accompanied by a matching change to the test metadata in the `schema-test-data`_
-repository. Both changes must be done as PRs following the `Pull request
-review`_  process. 
-
-The test metadata should exercise all graph shapes in actual use.
-
-The schema references (``describedBy``) in all metadata documents in the main
-branch of `schema-test-data`_ repository must match the schemas on the
-`master` branch of the `metadata-schema`_ repository.
-
-
-Pull request review
--------------------
+Pull requests against the `dcp2`_, the `metadata-schema`_ or the
+`schema-test-data` repositories are reviewed and approved in exactly the same
+way, provided they are involved in a semantic change to either the DCP/2
+specification, a DCP/2 standard operating procedure or a metadata schema
+change:
 
 As a PR author
 
-1)  Announce the PR on the `#dcp2` channel on Slack, @-mentioning all
+1)  Announce the PR on the ``#dcp2`` channel on Slack, @-mentioning all
     `Designated reviewers`_.
 
 2)  Request a review from all `Designated reviewers`_.
@@ -165,17 +202,26 @@ As a PR author
     channel on Slack, @-mentioning requested reviewers that haven't yet
     reviewed the PR.
 
-5)  The PR is considered *approved by the DCP** if either
+5)  If either
 
-    a)  all reviewers approve of the PR or
+    a)  all reviewers approve of the PR without conditions or
 
     b)  two weeks have passed since step 1 and there are no binding reviews
-        requesting changes.
+        requesting changes,
 
-6)  Otherwise, if this is a PR against the `metadata-schema`_ or
-    `schema-test-data`_ repositories and a reviewer requests that you first
-    update the DCP/2 system design specifcation first, close this PR and
-    proceed with step 2 in section `Changing the HCA metadata schema`_.
+    merge the PR. You are done unless any of the approvals are conditional. A
+    conditional approval is one that's dependent on successful testing using
+    one of the strategies mentioned in `Review process overview_`. If testing
+    fails, a reviewer may request amendmends to your changes. These requests
+    are made as comments to the original, now merged PR. Open another PR with
+    the requested amendmends and start at step 1.
+
+6)  If a reviewer requests that you first update the DCP/2 system design
+    specifcation or standard operating procedures first, suspend work on this
+    PR and open another PR against the `dcp2`_ repository. Start at step 1
+    there. Once that PR has been approved, update this PR branch with any
+    follow-up changes resulting from the `dcp2`_ PR review process and resume
+    this PR at step 1.
 
 7)  Otherwise, respond to every review comment either by making a source code
     change that you think appropriately addresses the comment or by replying
