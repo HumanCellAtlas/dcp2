@@ -561,31 +561,51 @@ name. ::
 
     day = [0-9]{2}
 
-    qualifier = [a-zA-Z][a-zA-Z0-9]{0,13}
+    qualifier = [a-zA-Z][a-zA-Z0-9]{0,15}
 
     deployment = "dev" | "staging" | "prod"
 
-    project_id = [0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}
+    project_id = [0-9a-f]{32}
+
+The ``project_id`` is the project UUID as allocated by the Ingest component. TDR
+does not allow dashes in dataset or snapshot names, so the ``project_id``
+field deviates from the standard string representation of a UUID by omitting the
+dashes.
+
+|nn| The standard representation can be reconstituted by inserting dashes as
+illustrated by the following Python code fragment::
+
+    '-'.join([x[0:8], x[8:12], x[12:16], x[16:20], x[20:]])
+
+where ``x`` is the value of the ``project_id`` field. Note that the constructor
+of the ``uuid.UUID`` class in the Python standard library supports the pure
+32-character hexadecimal representation out of the box::
+
+    >>> import uuid
+    >>> uuid.UUID('59c72b577d9c421db0f1618ddf5ce2d1')
+    UUID('59c72b57-7d9c-421d-b0f1-618ddf5ce2d1')
+
+|ne|
 
 The following regex can be used to validate dataset names::
 
-    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,13})?$
+    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,15})?$
 
 To validate snapshots (line breaks added for legibility)::
 
-    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,13})?
-    _([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})?
-    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,13}))?$
+    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,15})?
+    _([0-9a-f]{32})?
+    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?$
 
 To validate either (line breaks added for legibility)::
 
-    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,13})?
-    (?:_([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})?
-    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,13}))?)?$
+    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,15})?
+    (?:_([0-9a-f]{32})?
+    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?)?$
 
 The longest possible snapshot name in this scheme is 97 characters::
 
-    hca_staging_20200812_a1234567890123_9654e431-4c01-48d5-a79f-1c5439659da3__20200814_a1234567890123
+    hca_staging_20200812_a123456789012345_9654e4314c0148d5a79f1c5439659da3__20200814_a123456789012345
 
 Dataset examples::
 
@@ -598,7 +618,7 @@ Snapshot examples::
 
     hca_dev_20200812_dssPrimaryOnly___20200813
     hca_dev_20200812_dssPrimaryOnly___20200814_fixedUnicode
-
+    hca_dev_20210621_managedaccess_4298b4de92f34cbbbbfe5bc11b8c2422__20210622
 
 
 
