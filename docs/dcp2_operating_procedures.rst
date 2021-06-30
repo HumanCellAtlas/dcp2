@@ -58,13 +58,13 @@ metadata consumers like the Data Browser, especially if those consumers are
 required to interpret the added property. It would be difficult to explicitly
 define the criteria for classifing schema changes by impact. Instead, the
 impact is determined individually for every schema change. Changes that are
-deemed of low impactare fast-tracked through a lighter-weight review process.
+deemed of low impact are fast-tracked through a lighter-weight review process.
 
 
 Sizing schema changes
 ---------------------
 
-A *schema change* is a carefully seleced set of related modifications to one
+A *schema change* is a carefully selected set of related modifications to one
 or more of the JSONSchema documents in the `metadata-schema`_ repository. If
 a schema change *can* be made smaller by excluding a particular change to a
 schema document without sacrificing the desired end-user value, it *should*
@@ -109,7 +109,7 @@ Review process overview
 
 The process of reviewing schema changes utilizes Github's pull request
 (PR) feature. Every schema change begins with a PR against the `develop`
-branch of the `metadata-schema`_ repository. This is were the DCP/2
+branch of the `metadata-schema`_ repository. This is where the DCP/2
 consortium determines
 
 * the impact of the change
@@ -135,15 +135,15 @@ Schema changes that are sized correctly, and that are of some impact to other
 components, may require more involved testing. There are two ways of testing
 schema changes: 
 
-A)  (Meta)data exhibiting the proposed changes are first staged and then
+A)  (Meta)data exhibiting the proposed schema changes are first staged and then
     imported into the `dev` instance of TDR after which downstream components
     use the resulting `dev` snapshot to test the code changes that are required
     to support the schema change. The Ingest component can only populate
     staging areas from its staging instance, so the `develop` PR must be
-    approved(under the provision that the schema change may need to be amended
+    approved (under the provision that the schema change may need to be amended
     by another PR) and the changes are promoted to the staging branch.
 
-B) (Meta)data exhibiting the proposed schema changes are committed to a feature
+B)  (Meta)data exhibiting the proposed schema changes are committed to a feature
     branch of the `schema-test-data`_ repository, and a PR is filed for that
     branch. The `schema-test-data`_ repository can only populated using the
     staging instance of the Ingest component, so the PR against the `develop`
@@ -156,8 +156,8 @@ likely be requested for for most changes with some impact on other components.
 
 In some cases a lab submission not only involves a schema change but also
 introduces a novel way of linking the metadata enties into subgraphs. In those
-cases, reviewers are likely to request testing strategies B. A request for
-either strategy should be reasonably motivated. Possible reasons include 
+cases, reviewers are likely to request testing strategy B. A request for either
+strategy should be reasonably motivated. Possible reasons include
 
 - the need to not only review schema changes but also review how those changes
   affect actual metadata documents
@@ -184,7 +184,7 @@ Pull request reviews
 --------------------
 
 Pull requests against the `dcp2`_, the `metadata-schema`_ or the
-`schema-test-data` repositories are reviewed and approved in exactly the same
+`schema-test-data`_ repositories are reviewed and approved in exactly the same
 way, provided they are involved in a semantic change to either the DCP/2
 specification, a DCP/2 standard operating procedure or a metadata schema
 change:
@@ -211,7 +211,7 @@ As a PR author
 
     merge the PR. You are done unless any of the approvals are conditional. A
     conditional approval is one that's dependent on successful testing using
-    one of the strategies mentioned in `Review process overview_`. If testing
+    one of the strategies mentioned in `Review process overview`_. If testing
     fails, a reviewer may request amendmends to your changes. These requests
     are made as comments to the original, now merged PR. Open another PR with
     the requested amendmends and start at step 1.
