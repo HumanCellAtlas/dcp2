@@ -293,7 +293,7 @@ PR author invites the `Mediators`_ and all reviewers currently on the PR.
 Designated reviewers
 ~~~~~~~~~~~~~~~~~~~~
 
-- Claire aka ``@clairerye`` (EBI)
+- Enrique aka ``@ESapenaVentura`` (EBI)
 - Amnon aka ``@amnonkhen`` (EBI)
 - Ruchi aka ``@ruchim`` (Broad)
 - Kylee aka ``@kbergin`` (Broad)
