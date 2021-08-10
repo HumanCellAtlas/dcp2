@@ -107,29 +107,30 @@ to the proposed schema changes.
 Review process overview
 -----------------------
 
-The process of reviewing schema changes utilizes Github's pull request
-(PR) feature. Every schema change begins with a PR against the `develop`
-branch of the `metadata-schema`_ repository. This is where the DCP/2
-consortium determines
+The process of reviewing schema changes utilizes Github's pull request (PR)
+feature. Every schema change review begins with a PR against the `staging`
+branch of the `metadata-schema`_ repository. The `develop` and `integration`
+branches of that repository are not used anymore. Reviewers first determine
 
-* the impact of the change
+* the overall impact of the change
 
 * whether the schema change is `sized <Sizing schema changes>`_ correctly
 
-* whether the change requires updating the specification in the `dcp2`_ repository
+* whether the change requires updating the specification in the `dcp2`_
+  repository
 
 * whether it requires updating the test metadata in the `schema-test-data`_
   repository for other components to code unit tests against
 
 If a change requires specification changes, the `metadata-schema`_ PR review is
 suspended and a PR is filed against the `dcp2`_ repository and reviewed there.
-Once that PR is approved, the `metadata-schema`_ PR is revised and reviewed
-again.
+Once that PR is approved, the `metadata-schema`_ PR is revised to match the
+approved specification after which it is reviewed again.
 
 Schema changes that are sized correctly and have negligible impact to other
 components, are considered adopted by the DCP/2 as soon as the PR against the
-`develop` branch is approved. No further reviews of PRs against other branches or
-repositories are required.
+`metadata-schema`_ repository is approved. No further reviews of PRs against
+other branches or repositories are required.
 
 Schema changes that are sized correctly, and that are of some impact to other
 components, may require more involved testing. There are two ways of testing
@@ -139,20 +140,22 @@ A)  (Meta)data exhibiting the proposed schema changes are first staged and then
     imported into the `dev` instance of TDR after which downstream components
     use the resulting `dev` snapshot to test the code changes that are required
     to support the schema change. The Ingest component can only populate
-    staging areas from its staging instance, so the `develop` PR must be
-    approved (under the provision that the schema change may need to be amended
-    by another PR) and the changes are promoted to the staging branch.
+    staging areas from its staging instance, so the `metadata-schema`_ PR must
+    first be approved provisionally [#]_, merged and deployed to the ``staging``
+    deployment of the Ingest component.
 
 B)  (Meta)data exhibiting the proposed schema changes are committed to a feature
     branch of the `schema-test-data`_ repository, and a PR is filed for that
     branch. The `schema-test-data`_ repository can only populated using the
-    staging instance of the Ingest component, so the PR against the `develop`
-    branch of the `metadata-schema`_ repository must be approved (under the
-    condition that the schema change may need to be amended in another PR)
-    and the changes are promoted to the staging branch.
+    staging instance of the Ingest component, so the `metadata-schema`_ PR must
+    first be approved provisionally [#]_, merged and deployed to the ``staging``
+    deployment of the Ingest component.
 
-The reviewers of a PR can request either testing strategy. Strategy A will
-likely be requested for for most changes with some impact on other components.
+.. [#]
+   the provision being that the schema change may need to be amended in a
+   follow-up PR
+
+The reviewers of a PR can request either testing strategy.
 
 In some cases a lab submission not only involves a schema change but also
 introduces a novel way of linking the metadata enties into subgraphs. In those
