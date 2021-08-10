@@ -733,7 +733,7 @@ descriptors, one for metadata files and one for subgraphs.
    of one entity to coexist in a non-delta staging area. A delta staging area,
    on the other hand, must contain at most one object with a given
    ``entity_id``, and therefore only one version of that entity.
-   
+
 
    The ``.remove`` suffix is used to request the removal of an entity. It can
    only be used in staging areas that have the ``is_delta`` property set to
@@ -1134,7 +1134,7 @@ staging areas may contain updates is for backwards compatibility: The DCP
 already utilized this functionality before this section of the specification was
 written. |ne|
 
-|nn| It may be tempting to reuse an existing staging area after it has been 
+|nn| It may be tempting to reuse an existing staging area after it has been
 imported so as to avoid having to repopulate a completely new staging area for
 the next import. For non-delta staging areas this can be a good strategy. For
 delta staging areas it usually isn't because delta staging areas can only
@@ -1442,6 +1442,103 @@ row and finally soft-deleting any unmarked rows. |ne|
 
 
 
+
+Ontologies
+==========
+
+The `HCA Metadata Schema`_ designates certain document properties as
+ontologized. An *ontologized property* (OP) contains a JSON object referencing a
+term in an ontology that is hosted externally, outside of the DCP/2. The shape
+of that JSON object is specified by one of the `ontology modules`_ of the `HCA
+Metadata Schema`_. All such modules specify at least the following three child
+properties:
+
+``ontology``
+    optional; the stable and unique identifier of an ontology term
+
+``ontology_label``
+    optional; a human readable description of the term refered to by the
+    ``ontology`` child property
+
+``text``
+    required; a human readable description to fall back on should no term exist
+
+.. _ontology modules: https://github.com/HumanCellAtlas/metadata-schema/tree/master/json_schema/module/ontology
+
+
+Rules for producers
+-------------------
+
+When setting an OP in a metadata document, producers of metadata should
+select the most specific ontology term currently available that best describes
+the experimental facts and satisfies the requirements of the ontology module
+governing the the OP.
+
+A)  If a sufficiently specific match is found, the producer
+
+    -   sets the ``ontology`` child property of OP to the identifier of the
+        selected term and
+
+    -   sets the ``ontology_label`` and ``text`` child properties to the label
+        of the selected term.
+
+    The label of an ontology term can change over time. The producer must keep
+    the ``ontology_label`` and ``text`` child properties up to date whenever the
+    document is updated. There is no requirement to update the document whenever
+    the label changes.
+
+B)  If no sufficiently specific term exists, but a more general one does, the
+    producer
+
+    -   sets the ``ontology`` child property of OP to the identifier of the more
+        general term,
+
+    -   sets the ``ontology_label`` child property to the label of that term and
+
+    -   sets the ``text`` child property of the OP to what they expect the label
+        of a hypothetical exact match would be.
+
+    The producer initiates the process of adding that expected term to the
+    ontology. After that term has been added, the producer updates the
+    document as described under A).
+
+C)  Otherwise, the producer
+
+    -   omits the ``ontology`` and ``ontology_label`` child properties of the OP
+        and
+
+    -   sets the ``text`` child property of the OP to what they expect the
+        label of a hypothetical term would be if it existed.
+
+    The producer initiates the process of adding that expected term to the
+    ontology. After that term has been added, the producer updates the
+    document as described under A).
+
+
+Rules for consumers
+-------------------
+
+When reading an ontologized property (OP) in a metadata document, consumers of
+metadata should read the ``ontology`` child property of the OP, if that child
+property is present. If a description of the term in English (or any other
+language supported by the ontology) is needed, the consumer should look that
+description up in the ontology API referred to by the module governing the OP,
+using the term identifier in the ``ontology`` child property. If a lookup is not
+possible for technical reasons, the producer should read the ``text`` child
+property if present or the ``ontology_label`` otherwise. If both are absent, the
+consumer should raise an error.
+
+If the ``ontology`` child property is absent, the consumer instead reads the
+``text`` child property of the OP.
+
+|nn| Under the above rules, if an OP was set under scenario B, consumers will
+ignore the hypothetical label. This leads to a more consistent user experience.
+There is no guarantee that different wranglers come up with different
+hypothetical terms and we don't want the UX to suffer in that case, considering
+that there is at least a partial match available. If an OP was set using
+scenario C, the hypothetical term label is the best we have. In both scenarios
+the producer must update the document once the term becomes available, so the
+degraded UX is only temporary. |ne|
 
 Project-level matrices
 ======================
