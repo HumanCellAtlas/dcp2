@@ -104,6 +104,17 @@ yet have permeated through the system, making it easier to make adujustments
 to the proposed schema changes.
 
 
+Schema change authorship
+------------------------
+
+Any member of the consortium can *sponsor* a schema change. The sponsor can
+delegate authorship of the corresponding PRs to other members of the DCP/2
+consortium. While the PRs that comprise a particular schema change don't all
+need to have the same author, the sponsor must ensure that all those PRs are
+semantically consistent with each other.
+
+
+
 Review process overview
 -----------------------
 
@@ -170,17 +181,6 @@ strategy should be reasonably motivated. Possible reasons include
   Especially graph changes fall into that category.
 
 Schema changes that are sized incorrectly need to be revised.
-
-
-Schema change authorship
-------------------------
-
-Anyone can author a schema change. The PRs for one schema change don't all need
-to be by the same author, as long as there are no competing PRs pending in the
-same repository, for the same schema change. One person *should* author the PRs
-against the `metadata-schema`_ and `dcp2`_ repositories. That person is
-referred to as the *schema change author*. The schema change author can
-delegate authorship of PRs to other members of the DCP consortium.
 
 
 Pull request reviews
