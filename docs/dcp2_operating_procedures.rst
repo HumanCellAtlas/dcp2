@@ -214,10 +214,11 @@ As a PR author
 
     merge the PR. You are done unless any of the approvals are conditional. A
     conditional approval is one that's dependent on successful testing using
-    one of the strategies mentioned in `Review process overview`_. If testing
-    fails, a reviewer may request amendmends to your changes. These requests
-    are made as comments to the original, now merged PR. Open another PR with
-    the requested amendmends and start at step 1.
+    one of the strategies mentioned in `Review process overview`_. The
+    condition has to be specified in the summary comment on approval. If
+    testing fails, a reviewer may request amendmends to your changes. These
+    requests are made as comments to the original, now merged PR. Open
+    another PR with the requested amendmends and start at step 1.
 
 6)  If a reviewer requests that you first update the DCP/2 system design
     specifcation or standard operating procedures first, suspend work on this
