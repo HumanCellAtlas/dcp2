@@ -1959,3 +1959,65 @@ The ``supplementary_file.provenance.submitter_id`` field is set to
 ``c9efbb15-c50c-5796-8d15-35e9e1219dc5``. This UUIDv5 was generated using the
 same namespace UUID as for `Contributor-generated matrices (CGMs)`_ and the
 name ``dcp1 matrix service``.
+
+
+
+
+Access controls
+===============
+
+The DCP/2 manages access to the (meta)data that it hosts. When a *principal*
+(user, network, process, or application) that is not part of the DCP/2
+requests to retrieve a *resource* (metadata entity or data file) from a
+component of the DCP/2, the following rules apply:
+
+1) If the TDR snapshot containing the requested resource is marked public,
+   the request will be satisfied, independently of whether the principal's
+   identity is evident from the request or not.
+
+2) Otherwise, if the request is for metadata in the ``project`` entity, and
+   the request is made to the Azul REST API, the request will be satisfied.
+
+3) Otherwise, if the request is for a `contributor-generated matrix data file
+   <Contributor-generated matrices (CGMs)_>`_, and the request
+   is made to the Azul REST API, the request will be satisfied.
+
+4) Otherwise, if the request is for a `DCP/2-generated, project-level matrix
+   data file <DCP/2-generated matrices_>`_, and the request
+   is made to the Azul REST API, the request will be satisfied.
+
+5) Otherwise, if the request is accompanied by a valid OAuth 2.0 token, and
+   the identity associated with that token is registered with Terra's SAM and
+   the identified principal has been granted access to the TDR snapshot that
+   contains the requested resource, the request will be satisfied.
+
+6) Otherwise, the request will be denied.
+
+Each of the above rules must be enforced by all components of the DCP/2 that
+expose resources to principals outside of the DCP/2 except when the rule
+mentions a specific component.
+
+To be valid, an OAuth 2.0 token must satisfy the following conditions:
+
+- The token must have been issued by the Google identity provider
+
+- The token must have been issued to an OAuth 2.0 client application in a
+  Google Cloud project whose identifier is allow-listed in Terra
+
+- The token must have ``email`` scope
+
+To facilitate the above rules, all resources belonging to a particular project
+are placed into a separate TDR snapshot. Among the snapshots that make up a
+`data release <DCP data releases_>`_, there is exactly one snapshot per
+project. With the exception of the resources mentioned in rules 2 and 3
+above, if a principal has access to one resource belonging to a particular
+project, they have access to all resources in that project.
+
+|nn| The policies that govern which principals have access to which snapshots,
+or which snapshots are marked public will be incorporated into this
+specification at a later time. |ne|
+
+|nn| As written, this specification applies access controls at the project
+level. A future version of this specification will define more fine-grained
+access controls that apply to specific types of metadata entities and data
+files, or even individual metadata entities or data files. |ne|
