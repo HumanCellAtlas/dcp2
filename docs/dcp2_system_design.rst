@@ -134,6 +134,10 @@ relatively steep learning curve. The REST web service exposed by Azul, the
 Data Browser back end is a simpler but less powerful alternative that will
 service most consumers' needs.
 
+TDR maintains one dataset per HCA project, and multiple snapshots per dataset,
+but only one snapshot per dataset is included in a `DCP data release <DCP data
+releases_>`_.
+
 
 TDR datasets
 ------------
@@ -537,20 +541,20 @@ snapshots:
 Grammars below use a mix of `EBNF`_ and regular expressions. They are designed
 to be easily parsed, either using regular expressions or by splitting on
 underscore, and so that a lexicographical sorting reflects both the
-hierarchical relationship between datasets and snapshots as well as the time
-they were created. ::
+hierarchical relationship between deployments, projects, datasets and snapshots
+as well as the time they were created. ::
 
-    dataset_name = "hca_" , deployment , "_" , creation_date , ["_" , qualifier]
+    dataset_name = "hca_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
 
-    snapshot_name = dataset_name , "_", [project_id], "__" , creation_date , ["_" , qualifier]
+    snapshot_name = dataset_name , "_" , creation_date , ["_" , qualifier]
 
 .. _EBNF: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
 
 Note that snapshots names contain two dates: one denotes the creation of the
 dataset, the other that of the snapshot. The two consecutive underscores are
-not a typo, they exist to facilitate access controls in the future. If
-``project_id`` is omitted, there will be three consecutive underscores in the
-name. ::
+not a typo, they exist to facilitate more fine-grained access controls in the
+future. In other words, if ``project_id`` is omitted, there must be three
+consecutive underscores in the name. ::
 
     creation_date = year , month , day
 
@@ -586,38 +590,62 @@ of the ``uuid.UUID`` class in the Python standard library supports the pure
 
 |ne|
 
-The following regex can be used to validate dataset names::
+The following regex can be used to validate dataset names (line breaks added
+for legibility)::
 
-    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,15})?$
-
-To validate snapshots (line breaks added for legibility)::
-
-    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,15})?
+    ^
+    hca_(dev|prod|staging)
     _([0-9a-f]{32})?
-    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?$
+    __(\d{4})(\d{2})(\d{2})
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
+    $
+
+To validate snapshots::
+
+    ^
+    hca_(dev|prod|staging)
+    _([0-9a-f]{32})?
+    __(\d{4})(\d{2})(\d{2})
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
+    _(\d{4})(\d{2})(\d{2})
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
+    $
 
 To validate either (line breaks added for legibility)::
 
-    ^hca_(dev|prod|staging)_(\d{4})(\d{2})(\d{2})(_[a-zA-Z][a-zA-Z0-9]{0,15})?
-    (?:_([0-9a-f]{32})?
-    __(\d{4})(\d{2})(\d{2})(?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?)?$
+    ^
+    hca_(dev|prod|staging)
+    _([0-9a-f]{32})?
+    __(\d{4})(\d{2})(\d{2})
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
+    (?:
+    _(\d{4})(\d{2})(\d{2})
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
+    )?
+    $
 
 The longest possible snapshot name in this scheme is 97 characters::
 
-    hca_staging_20200812_a123456789012345_9654e4314c0148d5a79f1c5439659da3__20200814_a123456789012345
+    hca_staging_9654e4314c0148d5a79f1c5439659da3__20200812_a123456789012345_20200814_a123456789012345
 
 Dataset examples::
 
-    hca_dev_20200812
-    hca_dev_20200812_dssAllNoData
-    hca_dev_20200812_ebi
-    hca_dev_20200812_dssPrimaryOnly
+    hca_dev___20200812
+    hca_dev___20200812_ebi
+    hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901
+    hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_dcp2
 
 Snapshot examples::
 
-    hca_dev_20200812_dssPrimaryOnly___20200813
-    hca_dev_20200812_dssPrimaryOnly___20200814_fixedUnicode
-    hca_dev_20210621_managedaccess_4298b4de92f34cbbbbfe5bc11b8c2422__20210622
+    hca_dev___20200812_20210902
+    hca_dev___20200812_20210902_foo
+    hca_dev___20200812_ebi_20210902
+    hca_dev___20200812_ebi_20210902_bar
+    hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_20210902
+    hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_20210902_fubar
+    hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_dcp2_20210902
+    hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_dcp2_20210902_dcp9
+
 
 
 
