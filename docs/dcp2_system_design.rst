@@ -67,15 +67,10 @@ Datasets, snapshots and catalogs
 
 One TDR dataset includes all (meta)data to be released as part of the MVP.
 Other datasets may be created for testing and demonstration. All 29 of the
-DCP/1 projects are included in that dataset. So are any other projects listed
-in these two tracker sheets: `Data Ops Tracker`_ and `Datasets for MVP HCA
-DCP2`_. Multiple snapshots of the datasets may be created but only one
-snapshot is displayed in the Data Browser. The official MVP snapshot must be
-retained but earlier pre-release snapshots can and should be deleted.
-
-.. _Data Ops Tracker: https://www.google.com/url?q=https://docs.google.com/spreadsheets/d/17zoW8zGEp_qnnjKY6KH2CUuX5ubVDE0SkOINMvUw6kI&sa=D&source=editors&ust=1614906832769000&usg=AOvVaw0yT5zSGVe3kIjTYcLyNZk0
-
-.. _Datasets for MVP HCA DCP2: https://www.google.com/url?q=https://docs.google.com/spreadsheets/d/1ot-Xw-EaoCMxUxAVmXIWocx80hhmxa_g3StCEYH3oDo&sa=D&source=editors&ust=1614906832769000&usg=AOvVaw1-vdCuo2XvOy60fO7eB-rl
+DCP/1 projects are included in that dataset. Multiple snapshots of the datasets
+may be created but only one snapshot is displayed in the Data Browser. The
+official MVP snapshot must be retained but earlier pre-release snapshots can and
+should be deleted.
 
 An instance of the Data Browser backend (Azul) supports multiple catalogs. A
 catalog is a self-contained, independent index of a given TDR snapshot. The
