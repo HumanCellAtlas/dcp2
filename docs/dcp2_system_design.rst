@@ -540,7 +540,7 @@ underscore, and so that a lexicographical sorting reflects both the
 hierarchical relationship between deployments, projects, datasets and snapshots
 as well as the time they were created. ::
 
-    dataset_name = "hca_" , deployment , "_", [project_id], "__" , creation_date , ["_" , qualifier]
+    dataset_name = "hca_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
 
     snapshot_name = dataset_name , "_" , creation_date , ["_" , qualifier]
 
@@ -589,30 +589,36 @@ of the ``uuid.UUID`` class in the Python standard library supports the pure
 The following regex can be used to validate dataset names (line breaks added
 for legibility)::
 
-    ^hca_(dev|prod|staging)
+    ^
+    hca_(dev|prod|staging)
     _([0-9a-f]{32})?
     __(\d{4})(\d{2})(\d{2})
-    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?$
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
+    $
 
 To validate snapshots::
 
-    ^hca_(dev|prod|staging)
+    ^
+    hca_(dev|prod|staging)
     _([0-9a-f]{32})?
     __(\d{4})(\d{2})(\d{2})
     (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
     _(\d{4})(\d{2})(\d{2})
-    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?$
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
+    $
 
 To validate either (line breaks added for legibility)::
 
-    ^hca_(dev|prod|staging)
+    ^
+    hca_(dev|prod|staging)
     _([0-9a-f]{32})?
     __(\d{4})(\d{2})(\d{2})
     (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
     (?:
     _(\d{4})(\d{2})(\d{2})
-    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?$
+    (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
     )?
+    $
 
 The longest possible snapshot name in this scheme is 97 characters::
 
