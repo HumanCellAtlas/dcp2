@@ -16,10 +16,11 @@ Platform (DCP)
 Specifications & design documents
 =================================
 
-`DCP/2 System Design`_
+* `DCP/2 System Design`_
+* `DCP/2 Operating Procedures`_
 
 .. _DCP/2 System Design: docs/dcp2_system_design.rst
-
+.. _DCP/2 Operating Procedures: docs/dcp2_operating_procedures.rst
 
 
 
