@@ -1791,7 +1791,7 @@ information about CGMs.
 - the ``analysis_file`` schema has a ``matrix_cell_count`` property to capture
   the exact number of cells in the matrix
 
-- the ``file_core`` schema, and therefore every ``…_file`` schema  that uses
+- the `file_core`_ schema, and therefore every ``…_file`` schema that uses
   it has a ``file_source`` enum property for capturing  the specific source of
   the file e.g. ``DCP``, ``Contributor``, ``GEO``, ``Publication`` etc. This
   property serves the same purpose as the
@@ -1811,6 +1811,29 @@ exposes that tree in the same manner on the project details page. The inferral
 algorithm is identical to the one used for ``DCP/2-generated matrices`` with
 the one distinction that the subgraphs in the latter are exact, not
 approximate.
+
+Any ``analysis_file`` entity with a ``file_core.file_source`` value other than
+``DCP/2 Analysis`` or ``DCP/1 Matrix Service`` (see `file_core`_ schema) will
+be considered a CGM, regardless of their ``file_core.content_description``.
+Contributors often supply auxiliary files that, while not stricty being
+matrices, are still helpful in — or even required for — a proper
+interpretation of the actual matrix files. Disregarding
+``file_core.content_description`` ensures that the Data Browser includes such
+files in the CGM section of the project details page.
+
+|nn| The term *contributor-generated matrix* is nevertheless overly specific.
+A more representative term would be *contributor-generated analysis file*.
+However, users of the Data Browser reportedly look for "matrices" and may get
+confused when they don't find that word. We'll defer a remedy of this
+conflation to a future version of this specification. |ne|
+
+|nn| Prior versions of this specification neglected to mention that Azul used
+a heuristic to identify matrices: to be considered a matrix, an
+``analysis_file`` entity's ``file_core.content_description.ontology_label``
+property (or ``.text`` if the former was absent) had to contain the string
+``matrix``. Of the files matching that condition, only those with a
+``file_core.file_source`` value other than ``DCP/2 Analysis`` or ``DCP/1
+Matrix Service`` was deemed to be contributor-generated matrix. |ne|
 
 Additionally, the CGM analysis files are listed on the Files tab of the Data
 Browser.
