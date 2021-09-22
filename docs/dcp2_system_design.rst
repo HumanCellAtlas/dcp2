@@ -1121,6 +1121,20 @@ Once a data release is published, the snapshots that make up the release may
 never be deleted. Superseded snapshots that were removed from the release prior
 to publishing should be deleted.
 
+All snapshots that make up a release must reside in the same `BigQuery
+location`_ so that they can be indexed simultaneously by Azul using a single
+BigQuery reservation. Reservations are location-specific. The location of a
+particular snapshot may change as long as the previous condition is satisfied
+for all releases.
+
+|nn| This would mean that snapshots can be relocated, but that all snapshots in
+a release would have to be relocated together, and to the same location. If a
+snapshot is part of multiple releases, and that snapshot is to be relocated,
+all other snapshots in all releases the snapshot is part of must be relocated
+together, and to the same location. |ne|
+
+.. _BigQuery location: https://cloud.google.com/bigquery/docs/locations
+
 
 TDR datasets and data releases
 ------------------------------
