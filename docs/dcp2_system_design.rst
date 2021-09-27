@@ -1652,7 +1652,7 @@ from the tracking spreadsheet column named ``file_source`` e.g.
 ``contributor``, ``hca release``, ``arrayexpress`` and so on. A complete list
 can be found in the `Azul source`_ [#]_.
 
-.. _Azul source: https://github.com/DataBiosphere/azul/blob/a820e259ba9e37a94b5788a257d4c6f43fe31801/src/azul/plugins/metadata/hca/transform.py#L271
+.. _Azul source: https://github.com/DataBiosphere/azul/blob/bd666cdea14e66ad0a1612f126b2fcb9676c4af0/src/azul/plugins/metadata/hca/transform.py#L275
 
 The ``format`` property of a contributor-generated matrix file is set to the
 extension of the matrix file e.g., ``zip``, ``csv``, ``h5ad``, ``mtx.gz``,
