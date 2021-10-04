@@ -913,10 +913,58 @@ Importer idempotence
 
 The importer should not copy a data file if it is already present in TDR and
 the checksums match between the copy of the file in the staging area and the
-one in TDR/Firestore.
+one in TDR.
 
 Similarly, the importer must not create a new row in a TDR table if that row
 would be identical to another row except for its ``rowid``.
+
+
+The ``provenance`` property
+---------------------------
+
+Most metadata entities include the ``provenance`` property. While this
+property is not strictly required by the HCA metadata schema, the DCP/2
+heavily depends on it. The DCP/2 Data Browser backend (Azul) will not index a
+subgraph in which entites lack the ``provenance`` property. The
+``provenance`` property contains a JSON object (`schema <provenance_>`_). The
+following child properties of that object carry meaning in the DCP/2:
+
+.. _provenance: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/system/provenance.json
+
+- ``document_id`` (required), this is the ``entity_id``
+
+- ``submitter_id`` (optional), used to identify certain types of `Project-level
+  matrices`_
+
+- ``submission_date`` (required) the date and time an entity was introduced
+
+- ``update_date`` (optional) the date and time an entity was updated
+
+Some sources may find it difficult to provide a meaningful value for both
+``submission_date`` and ``update_date`` when they populate a staging area
+with updated entities. The ``submission_date`` in the new version of an
+updated entity needs to be set to the same value as in the original version,
+and that typically requires that the original is available to the source.
+Stateful sources, like Ingest, that keep track of entities in a database will
+have access to the original. Stateless sources, like Analysis, would need to
+retrieve it from TDR. To make their life easier, the importer applies a small
+transformation before importing an updated entity. In the pseudo-code below,
+``original`` denotes the version of the entity already present in TDR while
+``update`` denotes the version of the entity in the staging area to be
+imported::
+
+    if update.provenance.update_date is not set:
+        update.provenance.update_date = update.provenance.submission_date
+        if original was found in TDR:
+            update.provenance.submission_date = original.provenance.submission_date
+
+The above transformation retains ``update_date`` if it was specified by the
+source. It only takes effect when ``update_date`` is missing. Stateful sources
+can continue to set both properties. Stateless sources only need to provide
+``submission_date`` by setting it to the current date and time. If a
+source *does* provide ``update_date``, it must ensure that ``submission_date``
+accurately represents the date and time of when the *first* version of that
+entity was staged.
 
 
 Summary of schema changes
@@ -1246,8 +1294,11 @@ Update an entity
 ~~~~~~~~~~~~~~~~
 
 Write the updated entity document to an object in the ``metadata`` directory of
-the staging area. The name of that object must have the same ``entity_type`` and
-``entity_id`` as the original and a strictly higher ``version``.
+the staging area. The name of that object must have the same ``entity_type``
+and ``entity_id`` as the original and a strictly higher ``version``. Either set
+``provenance.submission_date`` to the current date and time or set it to the
+same value as in the original *and* set ``provenance.update_date`` to the
+current date and time. `The provenance property`_ section has the details.
 
 
 Update a data file
