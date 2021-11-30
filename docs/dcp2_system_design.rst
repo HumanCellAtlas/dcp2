@@ -544,7 +544,7 @@ underscore, and so that a lexicographical sorting reflects both the
 hierarchical relationship between deployments, projects, datasets and snapshots
 as well as the time they were created. ::
 
-    dataset_name = [system], "_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
+    dataset_name = [atlas], "_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
 
     snapshot_name = dataset_name , "_" , creation_date , ["_" , qualifier]
 
@@ -570,7 +570,7 @@ consecutive underscores in the name. ::
 
     project_id = [0-9a-f]{32}
     
-    system = "hca" | "lungmap"
+    atlas = "hca" | "lungmap"
 
 The ``project_id`` is the project UUID as allocated by the Ingest component. TDR
 does not allow dashes in dataset or snapshot names, so the ``project_id``
