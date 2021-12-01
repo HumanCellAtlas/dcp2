@@ -544,7 +544,7 @@ underscore, and so that a lexicographical sorting reflects both the
 hierarchical relationship between deployments, projects, datasets and snapshots
 as well as the time they were created. ::
 
-    dataset_name = [atlas], "_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
+    dataset_name = atlas , "_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
 
     snapshot_name = dataset_name , "_" , creation_date , ["_" , qualifier]
 
