@@ -470,6 +470,33 @@ SHA-256 hashes of the data file's content.
    hashes (and UUIDs for that matter) using a case sensitive quality
    comparison
 
+External DRS File URIs
+~~~~~~~~~~~~~~~~~~~~~~
+Some files may be hosted by an external DRS repository and are not available for import
+to the repository. In these cases, the `drs_uri` field may be provided in the file descriptor
+to indicate to this to the importer. Descriptors with this value set will receive an empty TDR
+`file_id` value after import to TDR [#]_, and the importer will skip any attempt to import
+the related data file.  Downstream consumers of these file descriptors must be resilient to
+`NULL` TDR `file_id` fields and fall back to using the DRS URI in the descriptor content field.
+
+Externally hosted files do not require a provided hash (i.e., ``crc32c``, ``sha1``, ``sha256`` and ``s3_etag``).
+The `drs_uri` field must be a URI utilizing the `drs://` scheme.
+A descriptor with the `drs_uri` field set follows below::
+
+    {
+        "describedBy": "https://schema.humancellatlas.org/system/1.0.0/file_descriptor",
+        "schema_version": "1.0.0",
+        "schema_type": "file_descriptor",
+        "file_name": "1b6d8348-d6e9-406a-aa6a-7ee886e52bf9/IDC9_L004_R2.fastq.gz",
+        "size": 4218464933,
+        "file_id": "ae5d1035-8f2b-4355-a0ef-bbb99958b303",
+        "file_version": "2020-05-01T04:26:07.021870Z",
+        "drs_uri": "drs://example.org/123abc"
+    }
+
+.. [#]
+    The TDR `file_id` field is distinct than the `file_id` field as expressed in the `file_descriptor`
+    metadata schema, and is populated by TDR during the import process.
 
 Analysis provenance
 -------------------
