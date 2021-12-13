@@ -476,7 +476,7 @@ External DRS File URIs
 
 Some files may be hosted by an external DRS repository and are not available for
 import to the repository. In these cases, the ``drs_uri`` property may be provided
-in the file descriptor to indicate this to the importer. A descriptors with
+in the file descriptor to indicate this to the importer. A descriptor with
 this property set will cause a ``null`` value in the ``file_id`` column of the
 ``…_file`` table row for the data file referenced in the descriptor, in any TDR
 snapshot containing the data file. [#]_,
