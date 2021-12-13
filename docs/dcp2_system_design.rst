@@ -470,18 +470,25 @@ SHA-256 hashes of the data file's content.
    hashes (and UUIDs for that matter) using a case sensitive quality
    comparison
 
+
 External DRS File URIs
 ~~~~~~~~~~~~~~~~~~~~~~
-Some files may be hosted by an external DRS repository and are not available for import
-to the repository. In these cases, the `drs_uri` field may be provided in the file descriptor
-to indicate to this to the importer. Descriptors with this value set will receive an empty TDR
-`file_id` value after import to TDR [#]_, and the importer will skip any attempt to import
-the related data file.  Downstream consumers of these file descriptors must be resilient to
-`NULL` TDR `file_id` fields and fall back to using the DRS URI in the descriptor content field.
 
-Externally hosted files do not require a provided hash (i.e., ``crc32c``, ``sha1``, ``sha256`` and ``s3_etag``).
-The `drs_uri` field must be a URI utilizing the `drs://` scheme.
-A descriptor with the `drs_uri` field set follows below::
+Some files may be hosted by an external DRS repository and are not available for
+import to the repository. In these cases, the ``drs_uri`` property may be provided
+in the file descriptor to indicate this to the importer. A descriptors with
+this property set will cause a ``null`` value in the ``file_id`` column of the
+``…_file`` table row for the data file referenced in the descriptor, in any TDR
+snapshot containing the data file. [#]_,
+The importer will skip any attempt to import the externally referenced files.
+Downstream consumers of these file descriptors must be resilient to a ```NULL``
+TDR ``file_id`` column and fall back to using the DRS URI as provided in the
+descriptor ``content`` column.
+
+The ``drs_uri`` property must be a URI utilizing the ``drs://`` scheme. Content
+hashes are required for descriptors of this nature.
+
+A descriptor with the ``drs_uri`` property set follows below::
 
     {
         "describedBy": "https://schema.humancellatlas.org/system/1.0.0/file_descriptor",
@@ -491,12 +498,17 @@ A descriptor with the `drs_uri` field set follows below::
         "size": 4218464933,
         "file_id": "ae5d1035-8f2b-4355-a0ef-bbb99958b303",
         "file_version": "2020-05-01T04:26:07.021870Z",
-        "drs_uri": "drs://example.org/123abc"
+        "drs_uri": "drs://example.org/123abc",
+        "crc32c": "0b83b575",
+        "sha1": "9ee5c924eb8cce21b2544b92cea7df0ac84e6e2f",
+        "sha256": "4c9b22cfd3eb141a30a43fd52ce576b586279ca021444ff191c460a26cf1e4cc",
+        "s3_etag": "c92e5374ac0a53b228d4c1511c2d2842-63"
     }
 
 .. [#]
-    The TDR `file_id` field is distinct than the `file_id` field as expressed in the `file_descriptor`
-    metadata schema, and is populated by TDR during the import process.
+    The TDR ``file_id`` field is distinct than the ``file_id`` field as
+    expressed in the `file_descriptor` metadata schema, and is populated by
+    TDR during the import process.
 
 Analysis provenance
 -------------------
