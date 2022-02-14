@@ -507,8 +507,10 @@ A descriptor with the ``drs_uri`` property set follows below::
 
 .. [#]
     The TDR ``file_id`` field is distinct than the ``file_id`` field as
-    expressed in the `file_descriptor` metadata schema, and is populated by
+    expressed in the ``file_descriptor`` `metadata schema`_, and is populated by
     TDR during the import process.
+
+.. _metadata schema: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/system/file_descriptor.json
 
 Analysis provenance
 -------------------
