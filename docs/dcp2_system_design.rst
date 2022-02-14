@@ -475,18 +475,19 @@ External DRS File URIs
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Some files may be hosted by an external DRS repository and are not available for
-import to the repository. In these cases, the ``drs_uri`` property may be provided
+import to the TDR. In these cases, the ``drs_uri`` property may be provided
 in the file descriptor to indicate this to the importer. A descriptor with
 this property set will cause a ``null`` value in the ``file_id`` column of the
 ``…_file`` table row for the data file referenced in the descriptor, in any TDR
-snapshot containing the data file. [#]_,
-The importer will skip any attempt to import the externally referenced files.
-Downstream consumers of these file descriptors must be resilient to a ```NULL``
-TDR ``file_id`` column and fall back to using the DRS URI as provided in the
-descriptor ``content`` column.
+snapshot containing the data file.[#]_
 
-The ``drs_uri`` property must be a URI utilizing the ``drs://`` scheme. Content
-hashes are required for descriptors of this nature.
+The importer will skip any attempt to import the externally referenced files.
+Downstream consumers of these file descriptors must be resilient to a row with a ```NULL`` value
+in the TDR ``file_id`` column and fall back to using the ``drs_uri`` property of the
+descriptor JSON in the ``content`` column of the same row.
+
+The ``drs_uri`` property must be a URI utilizing the ``drs://`` scheme. As for regular files, descriptors for files at external DRS URIs are required to have the ``crc32c`` and ``sha256`` content
+hashes.
 
 A descriptor with the ``drs_uri`` property set follows below::
 
@@ -506,7 +507,7 @@ A descriptor with the ``drs_uri`` property set follows below::
     }
 
 .. [#]
-    The TDR ``file_id`` field is distinct than the ``file_id`` field as
+    The TDR ``file_id`` column is distinct from the ``file_id`` property as
     expressed in the ``file_descriptor`` `metadata schema`_, and is populated by
     TDR during the import process.
 
