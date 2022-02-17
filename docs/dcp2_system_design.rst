@@ -485,8 +485,10 @@ Downstream consumers of these file descriptors must be resilient to a ```NULL``
 TDR ``file_id`` column and fall back to using the DRS URI as provided in the
 descriptor ``content`` column.
 
-The ``drs_uri`` property must be a URI utilizing the ``drs://`` scheme. Content
-hashes are required for descriptors of this nature.
+The ``drs_uri`` property must be one of:
+- a URI utilizing the ``drs://`` scheme
+- JSON `null` to indicate that a file will be present in the future
+Content hashes are required for descriptors of this nature.
 
 A descriptor with the ``drs_uri`` property set follows below::
 
