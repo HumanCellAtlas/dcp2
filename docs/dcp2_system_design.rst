@@ -544,7 +544,7 @@ underscore, and so that a lexicographical sorting reflects both the
 hierarchical relationship between deployments, projects, datasets and snapshots
 as well as the time they were created. ::
 
-    dataset_name = "hca_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
+    dataset_name = atlas , "_" , deployment , "_" , [project_id] , "__" , creation_date , ["_" , qualifier]
 
     snapshot_name = dataset_name , "_" , creation_date , ["_" , qualifier]
 
@@ -569,6 +569,8 @@ consecutive underscores in the name. ::
     deployment = "dev" | "staging" | "prod"
 
     project_id = [0-9a-f]{32}
+    
+    atlas = "hca" | "lungmap"
 
 The ``project_id`` is the project UUID as allocated by the Ingest component. TDR
 does not allow dashes in dataset or snapshot names, so the ``project_id``
@@ -594,7 +596,7 @@ The following regex can be used to validate dataset names (line breaks added
 for legibility)::
 
     ^
-    hca_(dev|prod|staging)
+    (hca|lungmap)_(dev|prod|staging)
     _([0-9a-f]{32})?
     __(\d{4})(\d{2})(\d{2})
     (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
@@ -603,7 +605,7 @@ for legibility)::
 To validate snapshots::
 
     ^
-    hca_(dev|prod|staging)
+    (hca|lungmap)_(dev|prod|staging)
     _([0-9a-f]{32})?
     __(\d{4})(\d{2})(\d{2})
     (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
@@ -614,7 +616,7 @@ To validate snapshots::
 To validate either (line breaks added for legibility)::
 
     ^
-    hca_(dev|prod|staging)
+    (hca|lungmap)_(dev|prod|staging)
     _([0-9a-f]{32})?
     __(\d{4})(\d{2})(\d{2})
     (?:_([a-zA-Z][a-zA-Z0-9]{0,15}))?
@@ -634,6 +636,7 @@ Dataset examples::
     hca_dev___20200812_ebi
     hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901
     hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_dcp2
+    lungmap_dev_b2db790a253d4b389aac598d2b659620__20211116_example
 
 Snapshot examples::
 
@@ -645,6 +648,7 @@ Snapshot examples::
     hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_20210902_fubar
     hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_dcp2_20210902
     hca_dev_4298b4de92f34cbbbbfe5bc11b8c2422__20210901_dcp2_20210902_dcp9
+    lungmap_dev_b2db790a253d4b389aac598d2b659620__20211116_20211201
 
 
 
