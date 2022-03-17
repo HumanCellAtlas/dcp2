@@ -792,8 +792,8 @@ descriptors, one for metadata files and one for subgraphs.
    
 
    The ``.remove`` suffix is used to request the removal of an entity. It can
-   only be used in staging areas that have the ``is_delta`` property set to
-   ``true``. If an object has this suffix, it must have a size of zero bytes.
+   only be used in staging areas that have the ``type`` property set to
+   ``delta``. If an object has this suffix, it must have a size of zero bytes.
 
 .. _HCA schema entity type: https://github.com/HumanCellAtlas/metadata-schema/tree/master/json_schema/type
 
@@ -807,13 +807,13 @@ descriptors, one for metadata files and one for subgraphs.
   `Generic file metadata`_.
 
    The ``.remove`` suffix is used to request the removal of a data file. It
-   can only be used in staging areas that have the ``is_delta`` property set
-   to ``true``. If an object has this suffix, it must have a size of zero
+   can only be used in staging areas that have the ``type`` property set
+   to ``delta``. If an object has this suffix, it must have a size of zero
    bytes.
 
    The ``.delete`` suffix is used to request the deletion of a data file. It
-   can only be used in staging areas that have the ``is_delta`` property set
-   to ``true``. If an object has this suffix, it must have a size of zero
+   can only be used in staging areas that have the ``type`` property set
+   to ``delta``. If an object has this suffix, it must have a size of zero
    bytes.
 
    For details on deletions and removals see `Types of data and metadata
@@ -863,8 +863,8 @@ descriptors, one for metadata files and one for subgraphs.
     ``links/{links_id}_{version}_`` prefix.
 
    The ``.remove`` suffix is used to request the removal of a subgraph. It can
-   only be used in staging areas that have the ``is_delta`` property set to
-   ``true``. If an object has this suffix, it must have a size of zero bytes.
+   only be used in staging areas that have the ``type`` property set to
+   ``delta``. If an object has this suffix, it must have a size of zero bytes.
    See `Types of data and metadata alterations`_ for details.
 
    A staging area may only contain exactly one subgraph object with a given
@@ -1233,11 +1233,10 @@ data release that precedes it. In other words, it is made up of the same set of
 snapshots as the previous data release. After that, and until the release is
 published, the (meta)data in the data release being prepared is subject to
 *alterations*. Alterations to (meta)data should generally be made in the form of
-delta staging areas. A delta staging area has the ``is_delta`` property set to
-``true``. The layout of delta staging areas and the rules for importing them
-differ slightly from those for non-delta staging areas i.e. those with a
-``is_delta`` value of ``false``. Only delta staging areas may indicate the
-removal of (meta)data or the deletion of data, non-delta staging areas must not.
+delta staging areas. A delta staging area has the ``type`` property set to
+``delta``. The layout of delta staging areas and the rules for importing them
+differ slightly from those for non-delta staging areas. Only delta staging areas
+may indicate the removal of (meta)data or the deletion of data, non-delta staging areas must not.
 
 Writing an entity object and a corresponding descriptor object to a staging area
 with the same content as that of the highest version of that entity already in
@@ -1245,9 +1244,9 @@ TDR while using a higher version in the name of that entity or descriptor object
 is referred to as a *redundant version*. Delta staging areas must not contain
 redundant versions of (meta)data.
 
-|nn| These are the main purposes of the ``is_delta`` property: 1) to alert the
+|nn| These are the main purposes of the ``delta`` staging areas: 1) to alert the
 importer to look for deletion/removal markers and 2) to explicitly prevent the
-redundant work of importing unaltered (meta)data. The reason that non-delta
+redundant work of importing unaltered (meta)data. The reason that ``normal``
 staging areas may contain updates is for backwards compatibility: The DCP
 already utilized this functionality before this section of the specification was
 written. |ne|
@@ -1330,9 +1329,9 @@ Update a data file
    independent from the column of the same name in TDR ``…_file`` tables and
    that this section only applies to the former.
 
-   If the staging area has the `is_delta`` property set to ``true`` (or
-   ``false``), the ``sha1`` and ``sha256`` properties must (or should) differ
-   from their respective values in the orginal. [#]_ In other words, redundant
+   If the staging area has the `type`` property set to ``delta``,
+   the ``sha1`` and ``sha256`` properties must (or should) differ
+   from their respective values in the original. [#]_ In other words, redundant
    updates are not allowed in delta staging areas, and not recommended in
    non-delta staging areas.
 
@@ -1481,7 +1480,7 @@ Add a data file to existing subgraphs
 Remove an entity
 ~~~~~~~~~~~~~~~~
 
-1. Make sure the staging area property ``is_delta`` is ``true``.
+1. Make sure the staging area property ``type`` is ``delta``.
 
 2. Create an empty object in the ``metadata`` directory of the staging area.
    The ``entity_type`` and ``entity_id`` fields in the object name must be the
@@ -1533,7 +1532,7 @@ yield in a 410 or 404 status response.
 Remove a subgraph
 ~~~~~~~~~~~~~~~~~
 
-1. Make sure the ``is_delta`` staging area property is ``true``.
+1. Make sure the ``type`` staging area property is ``delta``.
 
 
 2. Create an empty object in the ``links`` directory of the staging area. The
