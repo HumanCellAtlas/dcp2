@@ -724,8 +724,13 @@ The contents of ``staging_area.json`` must match the following schema::
    {
      "$schema": "https://json-schema.org/draft/2019-09/schema",
      "properties": {
-       "is_delta": {
-         "type": "boolean"
+       "type": {
+         "type": "string",
+         "enum": [
+            "normal",
+            "delta",
+            "updated"
+         ]
        }
      },
      "required": [
