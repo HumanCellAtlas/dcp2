@@ -741,11 +741,11 @@ The contents of ``staging_area.json`` must match the following schema::
 
 
 Staging are types
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 - ``normal`` contains a complete set of metadata and data files. It can have multiple file versions of a metadata entity identified by a uuid.
-- ``delta`` contains exclusively altered (added, deleted or updated) (meta)data. The specifics are defined in
-`Altering data and metadata`_ and `Types of data and metadata alterations`_.
+- ``delta`` contains exclusively altered (added, deleted or updated) (meta)data.
+  The specifics are defined in `Altering data and metadata`_ and `Types of data and metadata alterations`_.
 - ``updated`` contains a complete set of metadata files. The data files may not exist in this staging area if they have already been imported to Terra before.
 
 Object naming
