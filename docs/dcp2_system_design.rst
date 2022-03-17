@@ -734,7 +734,7 @@ The contents of ``staging_area.json`` must match the following schema::
        }
      },
      "required": [
-       "is_delta"
+       "type"
      ],
      "additionalProperties": false
    }
