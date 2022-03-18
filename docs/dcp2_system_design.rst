@@ -1250,12 +1250,13 @@ and Data Import team yet (March 2022), it was decided to have a new type of stag
 ``updated`` staging area to facilitate the metadata updates for all scenarios.
 The ``updated`` staging area will contain the latest set of metadata for a project.
 The ids of entities being updated should be maintained. The TDR importer will delete the dataset first
-then imports the ``updated`` staging area to recreate the dataset for that project.
+then import the ``updated`` staging area to recreate the dataset for that project.
 The absence of a data file referenced by a descriptor only constitutes an error
-if the datafile is not already present in TDR or has a different checksum.
+if the data file is not already present in TDR or has a different checksum.
 
-This mechanism may take long and may be expensive for an extremely large datasets (e.g. Tabula Muris)
+This mechanism may take longer and maybe expensive for extremely large datasets (e.g. Tabula Muris)
 in which case we could utilise the ``delta`` staging areas.
+
 
 
 Updating via "delta" staging areas
