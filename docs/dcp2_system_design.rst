@@ -1275,7 +1275,7 @@ redundant versions of (meta)data.
 
 |nn| These are the main purposes of the ``delta`` staging areas: 1) to alert the
 importer to look for deletion/removal markers and 2) to explicitly prevent the
-redundant work of importing unaltered (meta)data.|ne|
+redundant work of importing unaltered (meta)data. |ne|
 
 
 Types of data and metadata alterations
