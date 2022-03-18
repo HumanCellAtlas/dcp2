@@ -743,10 +743,10 @@ The contents of ``staging_area.json`` must match the following schema::
 Staging are types
 ~~~~~~~~~~~~~~~~~~
 
-- ``normal`` contains a complete set of metadata and data files. It can have multiple file versions of a metadata entity identified by a uuid.
+- ``normal`` contains a complete set of metadata and data files. Usually, this is the original staging area, used to import the metadata files for the first time to Terra. It can have multiple file versions of a metadata entity identified by a uuid.
 - ``delta`` contains exclusively altered (added, deleted or updated) (meta)data.
   The specifics are defined in `Altering data and metadata`_ and `Types of data and metadata alterations`_.
-- ``updated`` contains a complete set of metadata files. The data files may not exist in this staging area if they have already been imported to Terra before.
+- ``updated`` contains a complete set of metadata files. It contains only the latest version of a metadata file. The data files may not exist in this staging area if they have already been imported to Terra before.
 
 Object naming
 ~~~~~~~~~~~~~
@@ -1074,7 +1074,7 @@ issue (currently dcp1 and dcp2).
 Import errors
 -------------
 
-This work is currenly in progress and tracked by DSPDC-1604.
+This work is currently in progress and tracked by DSPDC-1604.
 
 Errors that occur during the importer's processing of the staging area for a
 particular source are logged by the importer to dedicated files in the staging
@@ -1232,11 +1232,39 @@ When a data release first enters the preparation phase, it is identical to the
 data release that precedes it. In other words, it is made up of the same set of
 snapshots as the previous data release. After that, and until the release is
 published, the (meta)data in the data release being prepared is subject to
-*alterations*. Alterations to (meta)data should generally be made in the form of
+*alterations*.
+
+A staging area may only be modified in between importer invocations, not while
+the importer is running. Coordination of access to a staging area occurs out of
+band e.g. via Slack or a ticketing system.
+
+Updating via "non-delta" staging areas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Since "normal" staging areas can contain multiple versions of an entity, it is possible
+to reuse an existing "normal" staging area and reimport it to import the updates.
+The DCP already utilized this functionality before the "delta" staging areas
+specification was written. This is still being supported for backwards compatibility.
+
+As the "delta" staging areas specification isn't implementedby Ingest
+and Data Import team yet (March 2022), it was decided to have a new type of staging area
+to facilitate doing metadata updates for all scenarios (metadata, subgraph updates and deletions).
+The "updated" staging area, which will contain the latest set of metadata for a project.
+The ids of entities being updated should be maintained.  The importer will delete and
+recreate the dataset for the project. The absence of a data file referenced by a descriptor
+only constitutes an error if the datafile is not already present in TDR or has a different checksum
+
+This mechanism may take long and may be expensive for an extremely large datasets (e.g. Tabula Muris)
+in which case we could utilise the "delta" staging areas.
+
+
+Updating via "delta" staging areas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Alterations to (meta)data should generally be made in the form of
 delta staging areas. A delta staging area has the ``type`` property set to
 ``delta``. The layout of delta staging areas and the rules for importing them
 differ slightly from those for non-delta staging areas. Only delta staging areas
-may indicate the removal of (meta)data or the deletion of data, non-delta staging areas must not.
+may indicate the removal of (meta)data or the deletion of data, non-delta staging
+areas must not.
 
 Writing an entity object and a corresponding descriptor object to a staging area
 with the same content as that of the highest version of that entity already in
@@ -1246,25 +1274,7 @@ redundant versions of (meta)data.
 
 |nn| These are the main purposes of the ``delta`` staging areas: 1) to alert the
 importer to look for deletion/removal markers and 2) to explicitly prevent the
-redundant work of importing unaltered (meta)data. The reason that ``normal``
-staging areas may contain updates is for backwards compatibility: The DCP
-already utilized this functionality before this section of the specification was
-written. |ne|
-
-|nn| It may be tempting to reuse an existing staging area after it has been 
-imported so as to avoid having to repopulate a completely new staging area for
-the next import. For non-delta staging areas this can be a good strategy. For
-delta staging areas it usually isn't because delta staging areas can only
-contain one version of anything and can't contain any unchanged (meta)data. The
-easiest way to satisfy that constraint is to create a completely new staging
-area for every import. It may also help in debugging to leave previously
-imported staging areas in the staging bucket by including the creation time or
-the target DCP release name in the staging area path. These decisions are left
-to the staging area source to make. |ne|
-
-A staging area may only be modified in between importer invocations, not while
-the importer is running. Coordination of access to a staging area occurs out of
-band e.g. via Slack or a ticketing system.
+redundant work of importing unaltered (meta)data.
 
 
 Types of data and metadata alterations
