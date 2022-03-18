@@ -1238,8 +1238,10 @@ A staging area may only be modified in between importer invocations, not while
 the importer is running. Coordination of access to a staging area occurs out of
 band e.g. via Slack or a ticketing system.
 
+
 Updating via "non-delta" staging areas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Since ``normal`` staging areas can contain multiple versions of an entity, it is possible
 to reuse an existing ``normal`` staging area and reimport it to import the updates.
 The DCP already utilized this functionality before the ``delta`` staging areas
@@ -1261,6 +1263,7 @@ in which case we could utilise the ``delta`` staging areas.
 
 Updating via "delta" staging areas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Alterations to (meta)data should generally be made in the form of
 delta staging areas. A delta staging area has the ``type`` property set to
 ``delta``. The layout of delta staging areas and the rules for importing them
