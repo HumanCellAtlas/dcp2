@@ -740,10 +740,10 @@ The contents of ``staging_area.json`` must match the following schema::
    }
 
 
-Staging are types
+Staging area types
 ~~~~~~~~~~~~~~~~~~
 
-- ``normal`` contains a complete set of metadata and data files. Usually, this is the original staging area, used to import the metadata files for the first time to Terra. It can have multiple file versions of a metadata entity identified by a uuid.
+- ``normal`` contains a complete set of metadata and data files. Usually, this is the original staging area used to import the metadata files for the first time to Terra. It can have multiple file versions of a metadata entity identified by a uuid.
 - ``delta`` contains exclusively altered (added, deleted or updated) (meta)data.
   The specifics are defined in `Altering data and metadata`_ and `Types of data and metadata alterations`_.
 - ``updated`` contains a complete set of metadata files. It contains only the latest version of a metadata file. The data files may not exist in this staging area if they have already been imported to Terra before.
@@ -1248,10 +1248,11 @@ specification was written. This is still being supported for backwards compatibi
 As the "delta" staging areas specification isn't implementedby Ingest
 and Data Import team yet (March 2022), it was decided to have a new type of staging area
 to facilitate doing metadata updates for all scenarios (metadata, subgraph updates and deletions).
-The "updated" staging area, which will contain the latest set of metadata for a project.
-The ids of entities being updated should be maintained.  The importer will delete and
-recreate the dataset for the project. The absence of a data file referenced by a descriptor
-only constitutes an error if the datafile is not already present in TDR or has a different checksum
+The "updated" staging area will contain the latest set of metadata for a project.
+The ids of entities being updated should be maintained. The TDR importer will delete the dataset first
+then imports the "updated" staging area to recreate the dataset for that project.
+The absence of a data file referenced by a descriptor only constitutes an error
+if the datafile is not already present in TDR or has a different checksum.
 
 This mechanism may take long and may be expensive for an extremely large datasets (e.g. Tabula Muris)
 in which case we could utilise the "delta" staging areas.
