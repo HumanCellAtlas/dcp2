@@ -1240,22 +1240,22 @@ band e.g. via Slack or a ticketing system.
 
 Updating via "non-delta" staging areas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Since "normal" staging areas can contain multiple versions of an entity, it is possible
-to reuse an existing "normal" staging area and reimport it to import the updates.
-The DCP already utilized this functionality before the "delta" staging areas
+Since ``normal`` staging areas can contain multiple versions of an entity, it is possible
+to reuse an existing ``normal`` staging area and reimport it to import the updates.
+The DCP already utilized this functionality before the ``delta`` staging areas
 specification was written. This is still being supported for backwards compatibility.
 
-As the "delta" staging areas specification isn't implementedby Ingest
-and Data Import team yet (March 2022), it was decided to have a new type of staging area
-to facilitate doing metadata updates for all scenarios (metadata, subgraph updates and deletions).
-The "updated" staging area will contain the latest set of metadata for a project.
+As the ``delta`` staging areas specification isn't implemented by Ingest
+and Data Import team yet (March 2022), it was decided to have a new type of staging area,
+``updated`` staging area to facilitate the metadata updates for all scenarios.
+The ``updated`` staging area will contain the latest set of metadata for a project.
 The ids of entities being updated should be maintained. The TDR importer will delete the dataset first
-then imports the "updated" staging area to recreate the dataset for that project.
+then imports the ``updated`` staging area to recreate the dataset for that project.
 The absence of a data file referenced by a descriptor only constitutes an error
 if the datafile is not already present in TDR or has a different checksum.
 
 This mechanism may take long and may be expensive for an extremely large datasets (e.g. Tabula Muris)
-in which case we could utilise the "delta" staging areas.
+in which case we could utilise the ``delta`` staging areas.
 
 
 Updating via "delta" staging areas
