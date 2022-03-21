@@ -486,7 +486,7 @@ Downstream consumers of these file descriptors must be resilient to a row with a
 in the TDR ``file_id`` column and fall back to using the ``drs_uri`` property of the
 descriptor JSON in the ``content`` column of the same row.
 
-The ``drs_uri`` property must be a URI utilizing the ``drs://`` scheme. As for regular files, descriptors for files at external DRS URIs are required to have the ``crc32c`` and ``sha256`` content
+The ``drs_uri`` property must be ``null`` or a string containing a URI utilizing the ``drs://`` scheme. As for regular files, descriptors for files at external DRS URIs are required to have the ``crc32c`` and ``sha256`` content
 hashes.
 
 If the ``drs_uri`` property has the ``null`` value, the data file is presently not available, neither in the staging area nor in an external DRS repository, but may be made available in the future, along with an updated descriptor referencing it. File descriptors with a ``null`` value for ``drs_uri`` are colloquially known as *phantom files*. Note that the staging area source must either provide the ``drs_uri`` property in the descriptor or a data file in the staging area. Omitting both is not valid and does not indicate a phantom file. The source must explicitly set ``drs_uri`` to ``null`` to indicate phantom files. As mentioned above, providing both is also invalid.
