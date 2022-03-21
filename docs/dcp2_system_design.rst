@@ -479,7 +479,7 @@ import to the TDR. In these cases, the ``drs_uri`` property may be provided
 in the file descriptor to indicate this to the importer. A descriptor with
 this property set will cause a ``null`` value in the ``file_id`` column of the
 ``…_file`` table row for the data file referenced in the descriptor, in any TDR
-snapshot containing the data file.[#]_
+snapshot containing the data file.[#]_ If this property is provided in a descriptor, regardless of its value, the staging area may not contain an object at the path `data/{file_name}` where ``file_name`` is the ``file_name`` property of the descriptor.
 
 The importer will skip any attempt to import the externally referenced files.
 Downstream consumers of these file descriptors must be resilient to a row with a ```NULL`` value
