@@ -746,7 +746,7 @@ Staging area types
 - ``normal`` contains a complete set of metadata and data files. Usually, this is the original staging area used to import the metadata files for the first time to Terra. It can have multiple file versions of a metadata entity identified by a uuid.
 - ``delta`` contains exclusively altered (added, deleted or updated) (meta)data.
   The specifics are defined in `Altering data and metadata`_ and `Types of data and metadata alterations`_.
-- ``updated`` contains a complete set of metadata files. It contains only the latest version of a metadata file. The data files may not exist in this staging area if they have already been imported to Terra before.
+- ``updated`` contains a complete set of metadata files for a project. It contains only the latest version of a metadata file. The data files may not exist in this staging area if they have already been imported to Terra before.
 
 Object naming
 ~~~~~~~~~~~~~
@@ -1239,28 +1239,6 @@ the importer is running. Coordination of access to a staging area occurs out of
 band e.g. via Slack or a ticketing system.
 
 
-Updating via "non-delta" staging areas
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Since ``normal`` staging areas can contain multiple versions of an entity, it is possible
-to reuse an existing ``normal`` staging area and reimport it to import the updates.
-The DCP already utilized this functionality before the ``delta`` staging areas
-specification was written. This is still being supported for backwards compatibility.
-
-As the ``delta`` staging areas specification isn't implemented by Ingest
-and Data Import team yet (March 2022), it was decided to have a new type of staging area,
-``updated`` staging area to facilitate the metadata updates for all scenarios.
-The ``updated`` staging area will contain the latest set of metadata for a project.
-The ids of entities being updated should be maintained. The TDR importer will delete the dataset first
-then import the ``updated`` staging area to recreate the dataset for that project.
-The absence of a data file referenced by a descriptor only constitutes an error
-if the data file is not already present in TDR or has a different checksum.
-
-This mechanism may take longer and maybe expensive for extremely large datasets (e.g. Tabula Muris)
-in which case we could utilise the ``delta`` staging areas.
-
-
-
 Updating via "delta" staging areas
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1280,6 +1258,26 @@ redundant versions of (meta)data.
 |nn| These are the main purposes of the ``delta`` staging areas: 1) to alert the
 importer to look for deletion/removal markers and 2) to explicitly prevent the
 redundant work of importing unaltered (meta)data. |ne|
+
+
+Updating via "non-delta" staging areas
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before the ``delta`` staging areas specification was written, the DCP utilized the functionality
+that ``normal`` staging areas can contain multiple versions of an entity and
+reuse them to import the updates to a project. This is still being supported for backwards compatibility.
+
+As the ``delta`` staging areas specification isn't implemented by Ingest
+and Data Import team yet (as of March 2022), it was decided to have a new type of staging area, the
+``updated`` staging area, to facilitate the support of metadata and subgraph updates and removals.
+The ``updated`` staging area will contain the latest set of metadata for a project.
+The ids of entities being updated should be maintained. The TDR importer will delete the dataset first
+then import the ``updated`` staging area to recreate the dataset for that project.
+The absence of a data file referenced by a descriptor only constitutes an error
+if the data file is not already present in TDR or has a different checksum.
+
+This mechanism may take longer and maybe expensive for extremely large datasets (e.g. Tabula Muris)
+in which case we could utilise the ``delta`` staging areas.
 
 
 Types of data and metadata alterations
