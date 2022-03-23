@@ -1277,7 +1277,7 @@ The absence of a data file referenced by a descriptor only constitutes an error
 if the data file is not already present in TDR or has a different checksum.
 
 This mechanism may take longer and maybe expensive for extremely large datasets (e.g. Tabula Muris)
-in which case we could utilise the ``delta`` staging areas.
+in which case the ``delta`` staging areas could be utilized.
 
 
 Types of data and metadata alterations
