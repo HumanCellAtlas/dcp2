@@ -486,7 +486,7 @@ of the descriptor.
 
 The importer will skip any attempt to import the externally referenced files.
 Downstream consumers of these file descriptors must be resilient to a row with
-a ```NULL`` value in the TDR ``file_id`` column and fall back to using the
+a ``NULL`` value in the TDR ``file_id`` column and fall back to using the
 ``drs_uri`` property of the descriptor JSON in the ``content`` column of the
 same row.
 
