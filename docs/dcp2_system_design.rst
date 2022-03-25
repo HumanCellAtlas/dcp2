@@ -511,6 +511,7 @@ An example of a descriptor with the ``drs_uri`` property set follows below::
         "schema_version": "1.0.0",
         "schema_type": "file_descriptor",
         "file_name": "1b6d8348-d6e9-406a-aa6a-7ee886e52bf9/IDC9_L004_R2.fastq.gz",
+        "content_type": "application/binary",
         "size": 4218464933,
         "file_id": "ae5d1035-8f2b-4355-a0ef-bbb99958b303",
         "file_version": "2020-05-01T04:26:07.021870Z",
