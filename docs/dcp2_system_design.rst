@@ -508,7 +508,7 @@ An example of a descriptor with the ``drs_uri`` property set follows below::
 
     {
         "describedBy": "https://schema.humancellatlas.org/system/2.1.0/file_descriptor",
-        "schema_version": "1.0.0",
+        "schema_version": "2.1.0",
         "schema_type": "file_descriptor",
         "file_name": "1b6d8348-d6e9-406a-aa6a-7ee886e52bf9/IDC9_L004_R2.fastq.gz",
         "content_type": "application/binary",
