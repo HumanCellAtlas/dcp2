@@ -491,7 +491,7 @@ a ``NULL`` value in the TDR ``file_id`` column and fall back to using the
 same row.
 
 The ``drs_uri`` property must be ``null`` or a string containing a URI utilizing
- the ``drs://`` scheme. As for regular files, descriptors for files at external
+the ``drs://`` scheme. As for regular files, descriptors for files at external
 DRS URIs are required to have the ``crc32c`` and ``sha256`` content hashes.
 
 If the ``drs_uri`` property has the ``null`` value, the data file is presently
