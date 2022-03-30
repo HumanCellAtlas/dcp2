@@ -727,9 +727,9 @@ The contents of ``staging_area.json`` must match the following schema::
        "type": {
          "type": "string",
          "enum": [
-            "normal",
+            "complete",
             "delta",
-            "updated"
+            "update"
          ]
        }
      },
@@ -739,14 +739,28 @@ The contents of ``staging_area.json`` must match the following schema::
      "additionalProperties": false
    }
 
+The meaning of the specific values of the ``type`` property are defined in the
+next section.
+
 
 Staging area types
 ~~~~~~~~~~~~~~~~~~
 
-- ``normal`` contains a complete set of metadata and data files. Usually, this is the original staging area used to import the metadata files for the first time to Terra. It can have multiple file versions of a metadata entity identified by a uuid.
-- ``delta`` contains exclusively altered (added, deleted or updated) (meta)data.
-  The specifics are defined in `Altering data and metadata`_ and `Types of data and metadata alterations`_.
-- ``updated`` contains a complete set of metadata files for a project. It contains only the latest version of a metadata file. The data files may not exist in this staging area if they have already been imported to Terra before.
+-  ``complete``: The staging area contains a complete set of metadata entities,
+   descriptors  and data files. Usually, this is the original staging area used
+   to import the metadata entities into TDR for the first time. It can have
+   multiple versions of a metadata entity.
+
+-  ``delta``: The staging area contains exclusively altered (added, deleted or
+   updated) (meta)data. The specifics are defined in `Altering data and
+   metadata`_ and `Types of data and metadata alterations`_.
+
+-  ``update``: The staging area contains a complete set of metadata entites and
+   descriptors, and a subset of data files. It contains only the latest version
+   of each metadata entity and descriptor. A data file may be absent from the
+   staging area if, at the time the staging area is imported, the file is
+   already present in TDR and matches the content hashes (CRC32C or SHA256)
+   specified in the descriptor.
 
 Object naming
 ~~~~~~~~~~~~~
@@ -1234,20 +1248,85 @@ snapshots as the previous data release. After that, and until the release is
 published, the (meta)data in the data release being prepared is subject to
 *alterations*.
 
+
+Coordination between source and importer
+-----------------------------------------
+
 A staging area may only be modified in between importer invocations, not while
 the importer is running. Coordination of access to a staging area occurs out of
 band e.g. via Slack or a ticketing system.
 
 
-Updating via "delta" staging areas
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Alterations via ``complete`` staging areas
+------------------------------------------
 
-Alterations to (meta)data should generally be made in the form of
-delta staging areas. A delta staging area has the ``type`` property set to
-``delta``. The layout of delta staging areas and the rules for importing them
-differ slightly from those for non-delta staging areas. Only delta staging areas
-may indicate the removal of (meta)data or the deletion of data, non-delta staging
-areas must not.
+|nn| Before the ``delta`` staging areas specification was written, the DCP
+utilized the functionality that ``normal`` staging areas can contain multiple
+versions of an entity and reuse them to import the updates to a project. This
+is still being supported for backwards compatibility. |ne|
+
+
+Alterations via ``update`` staging areas
+----------------------------------------
+
+An ``update`` staging area facilitates the same alterations as a ``delta``
+staging area, albeit in a less space efficient form, and potentially causing
+redundant work in the importer, but it has the significant advantage of being
+easier to implement. This mechanism may take longer and maybe expensive for
+large datasets (e.g. Tabula Muris) in which case a ``delta`` staging area
+should be utilized. An ``update`` staging area has the ``type`` property set
+to ``udpate``. 
+
+An ``update`` staging area contains a complete set of subgraphs, metadata
+entities, and descriptors. The ``entity_id`` of entities, and the
+``links_id`` of subgraphs, must be stable. Only genuinely new entities
+(or subgraphs) may be assigned a new ``entity_id`` or ``links_id``. When the
+subgraph partitioning changes, the staging area source should minimize ID
+churn: if the metadata graph is partitioned into 100 subgraphs before an
+update, and 200 after, the source should write all 200 subgraphs with a new
+``links_id`` each. If instead the number of subgraphs remains the same but
+some or all of the subgraphs are subject to an update, like an added entity,
+the same ``links_id`` should be used for each updated subgraph, and any
+unchanged subgraphs should be written under their original ``links_id``,
+obviously. In between those two extremes (all new ``links_id`` values and all
+the same), the source is free to pick any suitable algortithm for allocating
+new ``links_id`` values and reusing existing ones.
+
+Before importing an ``update`` staging area, the importer empties all entity
+and links tables in the target dataset. The target dataset is the TDR dataset
+into which the staging area is being imported. It does not delete any data
+files. It then proceeds importing the ``update`` staging area as if it were a
+``complete`` staging area with the following exception: 
+
+If the importer encounters a descriptor that references a data file that is
+absent from the staging area, the importer checks for an existing data file
+in the target dataset. If one exists and has the CRC32C or SHA-256 checksum
+specified in the descriptor, the importer continues to import the descriptor,
+referencing the pre-existing data file in the target dataset. Note that an
+``update`` staging area may not alter the ``file_id``, ``file_version``,
+``size``, ``crc32c`` and ``sha256`` properties, it may alter or add other
+properties such as ``file_name`` or ``describedBy``. If there is no existing
+data file or the checksums don't match, the importer aborts the import with
+an error. Also note that there may still be data files in an ``update``
+staging area and that those should be processed in the same manner as for
+``complete`` staging areas.
+
+After importing an ``update`` staging area, the importer should check for
+orphans, and delete them. An orphan is a data file that was referenced by a
+row in a ``…_file`` table *before* the import, but not *after*.
+
+
+Alterations via ``delta`` staging areas
+---------------------------------------
+
+Alterations to (meta)data should generally be made in the form of ``update``
+or ``delta`` staging areas. The former are described in the previous section.
+
+A delta staging area has the ``type`` property set to ``delta``. The layout
+of delta staging areas and the rules for importing them differ slightly from
+those for non-delta staging areas. Only delta staging areas may indicate the
+removal of (meta)data or the deletion of data, non-delta staging areas must
+not.
 
 Writing an entity object and a corresponding descriptor object to a staging area
 with the same content as that of the highest version of that entity already in
@@ -1259,34 +1338,10 @@ redundant versions of (meta)data.
 importer to look for deletion/removal markers and 2) to explicitly prevent the
 redundant work of importing unaltered (meta)data. |ne|
 
-
-Updating via "non-delta" staging areas
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Before the ``delta`` staging areas specification was written, the DCP utilized the functionality
-that ``normal`` staging areas can contain multiple versions of an entity and
-reuse them to import the updates to a project. This is still being supported for backwards compatibility.
-
-As the ``delta`` staging areas specification isn't implemented by Ingest
-and Data Import team yet (as of March 2022), it was decided to have a new type of staging area, the
-``updated`` staging area, to facilitate the support of metadata and subgraph updates and removals.
-The ``updated`` staging area will contain the latest set of metadata for a project.
-The ids of entities being updated should be maintained. The TDR importer will delete the dataset first
-then import the ``updated`` staging area to recreate the dataset for that project.
-The absence of a data file referenced by a descriptor only constitutes an error
-if the data file is not already present in TDR or has a different checksum.
-
-This mechanism may take longer and maybe expensive for extremely large datasets (e.g. Tabula Muris)
-in which case the ``delta`` staging areas could be utilized.
-
-
-Types of data and metadata alterations
---------------------------------------
-
-This specification distinguishes between several supported types of alterations.
-The subsections below describe each one of those types in detail and specify the
-steps to be performed by a staging area source in order to apply that
-alteration.
+This specification distinguishes between several supported types of
+alterations. The subsections below describe each one of those types in detail
+and specify the steps to be performed by a staging area source in order to
+apply that alteration.
 
 Until a (delta) staging area is imported, alterations can be reverted simply by
 undoing the steps taken to add the alteration. For example, if a delta staging
@@ -1342,11 +1397,11 @@ Update a data file
    independent from the column of the same name in TDR ``…_file`` tables and
    that this section only applies to the former.
 
-   If the staging area has the `type`` property set to ``delta``,
-   the ``sha1`` and ``sha256`` properties must (or should) differ
-   from their respective values in the original. [#]_ In other words, redundant
-   updates are not allowed in delta staging areas, and not recommended in
-   non-delta staging areas.
+   If the staging area has the `type`` property set to ``delta``, the ``sha1``
+   and ``sha256`` properties must (or should) differ from their respective
+   values in the original. [#]_ In other words, redundant updates are not
+   allowed in delta staging areas, and not recommended in non-delta staging
+   areas.
 
    Similarly, if the ``size`` property is different, the ``sha1`` and ``sha256``
    properties must differ between original and update. [#]_ The ``content-type``
