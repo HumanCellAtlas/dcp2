@@ -1338,6 +1338,9 @@ redundant versions of (meta)data.
 importer to look for deletion/removal markers and 2) to explicitly prevent the
 redundant work of importing unaltered (meta)data. |ne|
 
+Types of data and metadata alterations
+--------------------------------------
+
 This specification distinguishes between several supported types of
 alterations. The subsections below describe each one of those types in detail
 and specify the steps to be performed by a staging area source in order to
