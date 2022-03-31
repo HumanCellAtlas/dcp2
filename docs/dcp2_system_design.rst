@@ -1275,7 +1275,7 @@ redundant work in the importer, but it has the significant advantage of being
 easier to implement. This mechanism may take longer and maybe expensive for
 large datasets (e.g. Tabula Muris) in which case a ``delta`` staging area
 should be utilized. An ``update`` staging area has the ``type`` property set
-to ``udpate``. 
+to ``update``.
 
 An ``update`` staging area contains a complete set of subgraphs, metadata
 entities, and descriptors. The ``entity_id`` of entities, and the
