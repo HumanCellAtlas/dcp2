@@ -1270,28 +1270,29 @@ is still being supported for backwards compatibility. |ne|
 Alterations via ``update`` staging areas
 ----------------------------------------
 
-An ``update`` staging area facilitates the same alterations as a ``delta``
-staging area, albeit in a less space efficient form, and potentially causing
-redundant work in the importer, but it has the significant advantage of being
-easier to implement. This mechanism may take longer and maybe expensive for
-large datasets (e.g. Tabula Muris) in which case a ``delta`` staging area
-should be utilized. An ``update`` staging area has the ``type`` property set
-to ``update``.
+An ``update`` staging area has the ``type`` property set to ``update``. An
+``update`` staging area facilitates the same alterations as a ``delta``
+staging area, albeit in a less space-efficient form, and potentially causing
+redundant work in the importer. It has the significant advantage of being
+easier to implement. An import of an ``update`` staging area may take longer
+and may be expensive for large datasets (e.g. Tabula Muris). In this cases a
+``delta`` staging area should be utilized.
 
 An ``update`` staging area contains a complete set of subgraphs, metadata
 entities, and descriptors. The ``entity_id`` of entities, and the
 ``links_id`` of subgraphs, must be stable. Only genuinely new entities
-(or subgraphs) may be assigned a new ``entity_id`` or ``links_id``. When the
-subgraph partitioning changes, the staging area source should minimize ID
-churn: if the metadata graph is partitioned into 100 subgraphs before an
-update, and 200 after, the source should write all 200 subgraphs with a new
-``links_id`` each. If instead the number of subgraphs remains the same but
-some or all of the subgraphs are subject to an update, like an added entity,
-the same ``links_id`` should be used for each updated subgraph, and any
-unchanged subgraphs should be written under their original ``links_id``,
-obviously. In between those two extremes (all new ``links_id`` values and all
-the same), the source is free to pick any suitable algortithm for allocating
-new ``links_id`` values and reusing existing ones.
+(or subgraphs) may be assigned a new ``entity_id`` (or ``links_id``). 
+
+When the partitioning of the graph into subgraphs changes, the staging area
+source should minimize ID churn: if the metadata graph is partitioned into
+100 subgraphs before an update, and 200 after, the source should write all
+200 subgraphs with a new ``links_id`` each. If instead the number of
+subgraphs remains the same but some or all of the subgraphs are subject to an
+update like the addition of an entity, the same ``links_id`` should be used
+for each updated subgraph. The ``links_id`` of unchanged subgraphs should
+remain the same, obviously. In between those two extremes (all new
+``links_id`` values or all the same), the source is free to pick any suitable
+algortithm for allocating new ``links_id`` values and reusing existing ones.
 
 Before importing an ``update`` staging area, the importer empties all entity
 and links tables in the target dataset. The target dataset is the TDR dataset
