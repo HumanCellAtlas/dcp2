@@ -755,12 +755,13 @@ Staging area types
    updated) (meta)data. The specifics are defined in `Altering data and
    metadata`_ and `Types of data and metadata alterations`_.
 
--  ``update``: The staging area contains a complete set of metadata entites and
-   descriptors, and a subset of data files. It contains only the latest version
-   of each metadata entity and descriptor. A data file may be absent from the
-   staging area if, at the time the staging area is imported, the file is
-   already present in TDR and matches the content hashes (CRC32C or SHA256)
-   specified in the descriptor.
+-  ``update``: The staging area contains a complete set of metadata entites,
+   subgraphs and descriptors, and a partial set of data files. It contains
+   only the latest version of any metadata entity, subgraph and descriptor. A
+   data file may be absent from the staging area if, at the time the staging
+   area is imported, the file is already present in TDR and matches the
+   content hashes (CRC32C or SHA256) specified in the descriptor.
+
 
 Object naming
 ~~~~~~~~~~~~~
