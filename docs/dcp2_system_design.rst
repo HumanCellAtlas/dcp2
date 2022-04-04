@@ -1295,23 +1295,25 @@ remain the same, obviously. In between those two extremes (all new
 algortithm for allocating new ``links_id`` values and reusing existing ones.
 
 Before importing an ``update`` staging area, the importer empties all entity
-and links tables in the target dataset. The target dataset is the TDR dataset
-into which the staging area is being imported. It does not delete any data
-files. It then proceeds importing the ``update`` staging area as if it were a
-``complete`` staging area with the following exception: 
+and links tables in the *target* dataset. The *target* dataset is the TDR
+dataset into which the staging area is being imported. The importer does not
+delete any data files. It then proceeds importing the ``update`` staging area
+as if it were a ``complete`` staging area with one exception: If the importer
+encounters a descriptor referencing a data file that is absent from the
+staging area, the importer checks for an existing data file in the target
+dataset. If one exists and has the CRC32C or SHA-256 checksum specified in
+the descriptor, the importer continues to import the descriptor, referencing
+the pre-existing data file in the target dataset.
 
-If the importer encounters a descriptor that references a data file that is
-absent from the staging area, the importer checks for an existing data file
-in the target dataset. If one exists and has the CRC32C or SHA-256 checksum
-specified in the descriptor, the importer continues to import the descriptor,
-referencing the pre-existing data file in the target dataset. Note that an
-``update`` staging area may not alter the ``file_id``, ``size``, ``crc32c``
-and ``sha256`` properties, it may alter or add other properties such as
-``file_version``, ``file_name`` or ``describedBy``. If there is no existing
-data file or the checksums don't match, the importer aborts the import with
-an error. Also note that there may still be data files in an ``update``
-staging area and that those should be processed in the same manner as
-for ``complete`` staging areas.
+Note that an ``update`` staging area may not alter the ``file_id``, ``size``,
+``crc32c`` and ``sha256`` properties, it may alter or add other properties
+such as ``file_name`` or ``describedBy``. If there is no existing data file
+in TDR or the checksums of an existing file don't match, the importer aborts
+the entire import with an error.
+
+Also note that there may still be data files in an ``update`` staging area and
+that those should be processed in the same manner as for ``complete`` staging
+areas.
 
 After importing an ``update`` staging area, the importer should check for
 orphans, and delete them. An orphan is a data file that was referenced by a
