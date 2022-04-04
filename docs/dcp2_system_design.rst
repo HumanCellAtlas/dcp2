@@ -1338,6 +1338,7 @@ redundant versions of (meta)data.
 importer to look for deletion/removal markers and 2) to explicitly prevent the
 redundant work of importing unaltered (meta)data. |ne|
 
+
 Types of data and metadata alterations
 --------------------------------------
 
@@ -1671,6 +1672,7 @@ describe these matrices.
 
 The (now deprecated) interim and the permanent solution are defined in the
 sections below.
+
 
 Describing CGMs as supplementary files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
