@@ -1315,9 +1315,17 @@ Also note that there may still be data files in an ``update`` staging area and
 that those should be processed in the same manner as for ``complete`` staging
 areas.
 
-After importing an ``update`` staging area, the importer should check for
+|nn| After importing an ``update`` staging area, the importer should check for
 orphans, and delete them. An orphan is a data file that was referenced by a
-row in a ``…_file`` table *before* the import, but not *after*.
+row in a ``…_file`` table *before* the import, but not *after*. |ne|
+
+When the importer aborts an import due to, say, a checksum mismatch for a data
+file omitted from the imported staging area, it must restore the target
+dataset to the state before the aborted update.
+
+|nn| This could be implemented by rolling back prior changes, or by verifying
+the file checksums of all absent data files before making any modifications to
+the target dataset. |ne|
 
 
 Alterations via ``delta`` staging areas
