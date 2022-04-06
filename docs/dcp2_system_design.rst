@@ -1262,7 +1262,7 @@ Alterations via ``complete`` staging areas
 ------------------------------------------
 
 |nn| Before the ``delta`` staging areas specification was written, the DCP
-utilized the functionality that ``normal`` staging areas can contain multiple
+utilized the functionality that ``complete`` staging areas can contain multiple
 versions of an entity and reuse them to import the updates to a project. This
 is still being supported for backwards compatibility. |ne|
 
