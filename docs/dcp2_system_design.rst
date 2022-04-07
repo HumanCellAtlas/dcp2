@@ -1315,6 +1315,8 @@ Also note that there may still be data files in an ``update`` staging area and
 that those should be processed in the same manner as for ``complete`` staging
 areas.
 
+Renaming data files is currently not supported. See `Update a data file`_
+
 |nn| After importing an ``update`` staging area, the importer should check for
 orphans, and delete them. An orphan is a data file that was referenced by a
 row in a ``…_file`` table *before* the import, but not *after*. |ne|
