@@ -296,7 +296,7 @@ Designated reviewers
 - Enrique aka ``@ESapenaVentura`` (EBI)
 - Amnon aka ``@amnonkhen`` (EBI)
 - Ruchi aka ``@ruchim`` (Broad)
-- Andrew aka ``@aherbst-broad`` (Broad)
+- Nate aka ``@ncalvanese1`` (Broad)
 - Hannes aka ``@hannes-ucsc`` (UCSC)
 - Dave aka ``@NoopDog`` (UCSC)
 
