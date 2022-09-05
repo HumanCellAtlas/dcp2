@@ -293,6 +293,8 @@ PR author invites the `Mediators`_ and all reviewers currently on the PR.
 Designated reviewers
 ~~~~~~~~~~~~~~~~~~~~
 
+The list of reviewrs in maintained as the `CODEOWNERS`_ list of the `schema-test-data`_ repo.
+
 - Enrique aka ``@ESapenaVentura`` (EBI)
 - Amnon aka ``@amnonkhen`` (EBI)
 - Ruchi aka ``@ruchim`` (Broad)
@@ -300,6 +302,7 @@ Designated reviewers
 - Hannes aka ``@hannes-ucsc`` (UCSC)
 - Dave aka ``@NoopDog`` (UCSC)
 
+.. _CODEOWNERS: https://github.com/HumanCellAtlas/schema-test-data/pull/22/files#diff-fcf14c4b7b34fe7a11916195871ae66a59be87a395f28db73e345ebdc828085b
 
 Mediators
 ~~~~~~~~~
