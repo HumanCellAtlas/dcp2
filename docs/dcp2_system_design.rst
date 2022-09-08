@@ -2025,3 +2025,110 @@ specification at a later time. |ne|
 level. A future version of this specification will define more fine-grained
 access controls that apply to specific types of metadata entities and data
 files, or even individual metadata entities or data files. |ne|
+
+
+
+
+
+Ingest spreadsheets
+===================
+
+
+The Ingest component of the DCP/2 primarily uses multi-tab spreadsheets to
+gather the metadata for most HCA projects. Submitters and wranglers
+collaborate on populating the spreadsheet. There is one spreadsheet per
+project. Ingest imports the spreadsheet into its internal database which is
+then used to populate a staging area to be imported into TDR. Both the
+staging area and TDR store the metadata in its normal and authoritative form,
+as JSON compliant with the HCA metadata schema.
+
+The only way for consumers to access that metadata verbatim is via the TDR API
+in combination with BigQuery. That access method is powerful and convenient,
+but requires knowledge of SQL, the HCA metadata schema and how it is
+represented in TDR snapshots. The other methods for accessing metadata
+involve interactive use of the DCP/2 Data Browser frontend — or programatic
+use of its backend — to view and filter a subset of the metadata. They result
+in either
+
+- a CSV manifest with columns for select metadata properties, 
+
+- JSON in the backend's proprietary schema or 
+
+- a Terra workspace populated with tables for select metadata entity types,
+  and columns for select properties of said entity types. 
+
+While those methods are easy to use and yield slices of metadata that span
+more than one HCA project, they don't produce a verbatim copy of the metadata
+i.e. a copy that from which metadata entities of certain types or properties
+of those entities are absent.
+
+As a stop-gap, the DCP/2 has decided to include the EBI spreadsheet for each
+project in TDR and make that spreadsheet accessible for interactive and
+programmatic download through the HCA Data Browser. This section describes
+how this is implemented.
+
+The DCP already provides a mechanism for attaching arbitrary files to a
+project: supplementary files, a perfect fit for this use case. It has the
+advantage of making not requiring and changes to TDR or the TDR importer, but
+more importantly, this mechanism provides essentially for free
+
+- direct download of the spreadsheets from the Data Browser, 
+
+- bulk downloads of the spreadsheets via curl, 
+
+- handover of the spreadsheets to a Terra workspace, 
+
+- access controls on the spreadsheet 
+
+Note that this mechanism treats the spreadsheets atomically, the user has to
+download and process the entire spreadsheet for a project, even if they're
+only interested in a slice of the metadata contained therein. There is no way
+to download only a slice of a spreadsheet, or to combine multiple slices of
+spreadsheets for different projects into a single download. As an admittedly
+extreme example, if a user were interested in the verbatim metadata
+associated with a single file from each project, they would have to download
+all spreadsheets and manually select the rows of interest in each of them.
+
+To provide the Ingest spreadsheet for a project with a given `project_id`, the
+staging area for that project must be populated with the following objects:
+
+1) The spreadsheet itself in Microsoft Excel format is located in the `data/`
+directory, using Ingest's original file name for the spreadsheet, but with
+the extension `.xlsx`.
+
+2) A descriptor referring to the data file is located at
+`descriptors/supplementary_file/{entity_id}_{version}.json` 
+
+3) A metadata entity describing the spreadsheet goes into
+`metadata/supplementary_file/{entity_id}_{version}.json`
+
+4) A subgraph tying the spreadsheet to the project goes into `links/
+{links_id}_{version}_{project_id}.json`.
+
+The staging area containing the spreadsheet must be complete, in other words,
+it must contain all data and metadata for the project. The TDR importer must
+delete all existing dataset rows for the project prior to importing the
+corresponding staging area. This is necessary because the DCP/2 has no
+efficient mechanism for handling updates.
+
+The supplementary_file entity from 3) has a distinct combination of values for
+the `.content_description` and `.file_source` properties, a combination that
+uniquely designates this file as an Ingest spreadsheet. That way the Data
+Browser can discover Ingest spreadsheets and handle them as desired.
+Specifically, `.file_source` is set to `"DCP/2 Ingest"`. The pull request that
+adds that entry to the `enum` HCA metadata schema for `file_core.file_source`
+is `#1490`_. The `.content_description` property is set to
+`"metadata"` (TODO: add specific link to ontology term), 
+
+.. _#1490: https://github.com/HumanCellAtlas/metadata-schema/pull/1490
+
+The subgraph from 4) has one entry in its `.links` property; that entry has
+`.link_type` set to `"supplementary_file_link"`, its `.files` property refers
+to the `entity_id` of the supplementary file entity from 3) and its `.entity`
+property is set to the `project_id` of the project to which the spreadsheet
+belongs. There can only be one Ingest spreadsheet per HCA project.
+
+The `links_id` and `entity_id` can be arbitrary UUIDs but it is recommended to
+derive them from the `project_id` using the v5 UUID mechanism, each with a
+different namespace, so that the same `project_id` yields a `links_id` that
+differs from the `entity_id` derived from the same `project_id`.
