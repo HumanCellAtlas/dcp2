@@ -2175,8 +2175,13 @@ uniquely designates this file as an Ingest spreadsheet. That way the Data
 Browser can discover Ingest spreadsheets and handle them as desired.
 Specifically, `.file_source` is set to `"DCP/2 Ingest"`. The pull request that
 adds that entry to the `enum` HCA metadata schema for `file_core.file_source`
-is `#1490`_. The `.content_description` property is set to
-`"metadata"` (TODO: add specific link to ontology term), 
+is `#1490`_. The `.content_description` property is set to:
+
+- `.text`: `"metadata"`
+
+- `.ontology_id`: `"data:2193"`
+
+- `.ontology_label`: `"Database entry metadata"`
 
 .. _#1490: https://github.com/HumanCellAtlas/metadata-schema/pull/1490
 
