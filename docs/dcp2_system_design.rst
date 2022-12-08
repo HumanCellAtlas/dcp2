@@ -2179,9 +2179,11 @@ that adds that entry to the ``enum`` HCA metadata schema for
 ``file_core.file_source`` is `#1490`_. The ``.content_description`` property
 is set to::
 
-- `.ontology_id`: `"data:2193"`
-
-- `.ontology_label`: `"Database entry metadata"`
+    {
+        "text": "metadata",
+        "ontology_id": "data:2193",
+        ".ontology_label": "Database entry metadata"
+    }
 
 .. _#1490: https://github.com/HumanCellAtlas/metadata-schema/pull/1490
 
