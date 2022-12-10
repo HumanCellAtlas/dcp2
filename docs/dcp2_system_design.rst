@@ -2098,7 +2098,7 @@ collaborate on populating the spreadsheet. There is one spreadsheet per
 project. Ingest imports the spreadsheet into its internal database which is
 then used to populate a staging area to be imported into TDR. Both the
 staging area and TDR store the metadata in its normal and authoritative form,
-as JSON confirming to the HCA metadata schema.
+as JSON conforming to the HCA metadata schema.
 
 The only way for consumers to access that metadata verbatim is via the TDR API
 in combination with BigQuery. That access method is powerful and convenient,
