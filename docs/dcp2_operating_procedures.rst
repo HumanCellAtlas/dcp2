@@ -195,22 +195,26 @@ change:
 As a PR author
 
 1)  Announce the PR on the ``#dcp2`` channel on Slack, @-mentioning all
-    `Designated reviewers`_.
+    `Designated reviewers`_. If the changes in the PR match the criteria for
+    `expedited review`_, label the PR as ``expedited`` in GitHub and note that
+    fact in the Slack announcement thread.
 
-2)  Request a review from all `Designated reviewers`_.
+2)  In GitHub, request a review from all `Designated reviewers`_.
 
-3)  Wait one week.
+3)  Wait one week. For `expedited review`_, wait two business days. A business
+    day is a weekday that is not a holiday for any of the participating
+    institutions.
 
-4)  If this is the first review cycle, remind about the PR on the ``#dcp2``
-    channel on Slack, @-mentioning requested reviewers that haven't yet
-    reviewed the PR.
+4)  If this is the first cycle of a normal, non-expedited review, remind about
+    the PR on the ``#dcp2`` channel on Slack, @-mentioning requested reviewers
+    that haven't yet reviewed the PR.
 
 5)  If either
 
     a)  all reviewers approve of the PR without conditions or
 
-    b)  two weeks have passed since step 1 and there are no binding reviews
-        requesting changes,
+    b)  two weeks (or two business days, for `expedited review`_) have passed
+        since step 1 and there are no binding reviews requesting changes,
 
     merge the PR. You are done unless any of the approvals are conditional. A
     conditional approval is one that's dependent on successful testing using
@@ -227,7 +231,12 @@ As a PR author
     follow-up changes resulting from the `dcp2`_ PR review process and resume
     this PR at step 1.
 
-7)  Otherwise, respond to every review comment either by making a source code
+7)  If a reviewer requests that the PR be changed from `expedited review`_ to
+    normal review, remove the label and note that fact on the Slack announcement
+    thread. The current and subsequent review cycles revert back to the normal
+    timeline.
+
+8)  Otherwise, respond to every review comment either by making a source code
     change that you think appropriately addresses the comment or by replying
     with a comment explaining your opposition to the change or asking for more
     information. When addressing a set of related review comments with a source
@@ -236,15 +245,16 @@ As a PR author
     branch unless doing so helps reviewers to better understand the branch
     history.
 
-8)  Start another cycle by requesting a review from the reviewers currently on
+9)  Start another cycle by requesting a review from the reviewers currently on
     the PR, even those that already approved the PR or just commented on it.
     Proceed to step 3.
 
-Steps 1, 2 and 8 must be done on a weekday.
+Steps 1, 2 and 9 must be done on a weekday.
 
 As a PR reviewer
 
-1)  Respond to review requests within one week of the request or 
+1)  Respond to review requests within one week of the request (two business days
+    for `expedited review`_) or
 
 2)  Name a delegate within one business day of the request. Do so by cancelling
     the request for review by you and requesting a review from the delegate
@@ -279,6 +289,14 @@ At no time during the life-time of the PR can there be more reviewers listed on
 the PR than there are entries in the lists of `Designated reviewers`_ and
 `Mediators`_.
 
+Expedited review
+~~~~~~~~~~~~~~~~
+
+Certain trivial changes are eligible for a compressed review timeline, as
+defined in `Pull request reviews`_ above. The following changes are eligible for
+expedited review:
+
+- Additions of enum values to ``project.hca_bionetworks.hca_tissue_atlas``
 
 Discourse
 ~~~~~~~~~
