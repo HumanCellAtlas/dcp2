@@ -297,7 +297,7 @@ defined in `Pull request reviews`_ above. The following changes are eligible for
 expedited review:
 
 - Additions of enum values to ``project.hca_bionetworks.hca_tissue_atlas``
-- Fixing typos, formatting, incorrect urls
+- Fixing typos, formatting, incorrect urls, copy-paste mistakes, e.g. `describedBy` urls that were copies form other fields and not changed to the new document they describe.
 
 Discourse
 ~~~~~~~~~
