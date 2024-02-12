@@ -136,7 +136,7 @@ service most consumers' needs.
 
 TDR maintains one dataset per HCA project, and multiple snapshots per dataset,
 but only one snapshot per dataset is included in a `DCP data release <DCP data
-releases_>`_.
+releases_>`__.
 
 
 TDR datasets
@@ -145,7 +145,7 @@ TDR datasets
 A TDR dataset is made up of one table per concrete HCA metadata entity type.
 These entity types are defined in JSON schema, one schema per type. The JSON
 schema source code is hosted on Github—each ``*.json`` file underneath `this
-Github folder <metadata entities_>`_ defines a concrete HCA entity type. [#]_
+Github folder <metadata entities_>`__ defines a concrete HCA entity type. [#]_
 Each row in a TDR table represents exactly one HCA entity. A *document* is a
 metadata entity serialized as JSON, using one of the concrete schemas.
 
@@ -627,7 +627,7 @@ consecutive underscores in the name. ::
     deployment = "dev" | "staging" | "prod"
 
     project_id = [0-9a-f]{32}
-    
+
     atlas = "hca" | "lungmap"
 
 The ``project_id`` is the project UUID as allocated by the Ingest component. TDR
@@ -838,7 +838,7 @@ descriptors, one for metadata files and one for subgraphs.
    of one entity to coexist in a non-delta staging area. A delta staging area,
    on the other hand, must contain at most one object with a given
    ``entity_id``, and therefore only one version of that entity.
-   
+
 
    The ``.remove`` suffix is used to request the removal of an entity. It can
    only be used in staging areas that have the ``is_delta`` property set to
@@ -988,7 +988,7 @@ Most metadata entities include the ``provenance`` property. While this
 property is not strictly required by the HCA metadata schema, the DCP/2
 heavily depends on it. The DCP/2 Data Browser backend (Azul) will not index a
 subgraph in which entites lack the ``provenance`` property. The
-``provenance`` property contains a JSON object (`schema <provenance_>`_). The
+``provenance`` property contains a JSON object (`schema <provenance_>`__). The
 following child properties of that object carry meaning in the DCP/2:
 
 .. _provenance: https://github.com/HumanCellAtlas/metadata-schema/blob/master/json_schema/system/provenance.json
@@ -1104,7 +1104,7 @@ To address this issue, the DSS adapter removes those two fields and the Ingest
 adapter is modified to not emit them. Luckily, the fields are not required so
 removing them from documents that **do** happen to carry an updated schema
 declaration does **not** invalidate those documents. `The provenance schema
-will be revised to remove the fields again <provenance schema_>`_.
+will be revised to remove the fields again <provenance schema_>`__.
 
 .. _provenance schema: https://github.com/HumanCellAtlas/metadata-schema/issues/1316
 
@@ -1301,7 +1301,7 @@ staging areas may contain updates is for backwards compatibility: The DCP
 already utilized this functionality before this section of the specification was
 written. |ne|
 
-|nn| It may be tempting to reuse an existing staging area after it has been 
+|nn| It may be tempting to reuse an existing staging area after it has been
 imported so as to avoid having to repopulate a completely new staging area for
 the next import. For non-delta staging areas this can be a good strategy. For
 delta staging areas it usually isn't because delta staging areas can only
@@ -1668,7 +1668,7 @@ download that archive and extract it locally.
 
 The interim solution stores the contributor-generated matrices as data files
 in the TDR and describes them with a `file descriptor <Generic file
-metadata_>`_, a ``supplementary_file`` entity and a ``supplementary_link``
+metadata_>`__, a ``supplementary_file`` entity and a ``supplementary_link``
 entry in a subgraph. There will be one subgraph (and therefore one
 ``links.json`` document) per HCA project. If the contributor provided multiple
 matrices stratified by, say, species and organ, the per-project subgraph will
@@ -2041,11 +2041,11 @@ component of the DCP/2, the following rules apply:
    the request is made to the Azul REST API, the request will be satisfied.
 
 3) Otherwise, if the request is for a `contributor-generated matrix data file
-   <Contributor-generated matrices (CGMs)_>`_, and the request
+   <Contributor-generated matrices (CGMs)_>`__, and the request
    is made to the Azul REST API, the request will be satisfied.
 
 4) Otherwise, if the request is for a `DCP/2-generated, project-level matrix
-   data file <DCP/2-generated matrices_>`_, and the request
+   data file <DCP/2-generated matrices_>`__, and the request
    is made to the Azul REST API, the request will be satisfied.
 
 5) Otherwise, if the request is accompanied by a valid OAuth 2.0 token, and
@@ -2070,7 +2070,7 @@ To be valid, an OAuth 2.0 token must satisfy the following conditions:
 
 To facilitate the above rules, all resources belonging to a particular project
 are placed into a separate TDR snapshot. Among the snapshots that make up a
-`data release <DCP data releases_>`_, there is exactly one snapshot per
+`data release <DCP data releases_>`__, there is exactly one snapshot per
 project. With the exception of the resources mentioned in rules 2 and 3
 above, if a principal has access to one resource belonging to a particular
 project, they have access to all resources in that project.
