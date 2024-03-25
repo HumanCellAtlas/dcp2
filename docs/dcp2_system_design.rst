@@ -4,8 +4,8 @@
 
 .. role:: raw-html(raw)
    :format: html
-.. |nn| replace:: :raw-html:`<blockquote>`
-.. |ne| replace:: :raw-html:`</blockquote>`
+.. |nn| replace:: ``Non-normative note:``
+.. |ne| replace:: ``(end of note)``
 
 
 
@@ -14,8 +14,8 @@
 DCP/2 System Design
 ===================
 
-|nn| Text in a block quote (like this) is not normative. It was included for
-informational purposes only and does not bear on the implementation. |ne|
+Text between |nn| and |ne| is not normative. It is included for informational
+purposes only and does not bear on the implementation.
 
 .. contents::
 
