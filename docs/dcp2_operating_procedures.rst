@@ -311,7 +311,6 @@ PR author invites the `Mediators`_ and all reviewers currently on the PR.
 Designated reviewers
 ~~~~~~~~~~~~~~~~~~~~
 
-- Enrique aka ``@ESapenaVentura`` (EBI)
 - Amnon aka ``@amnonkhen`` (EBI)
 - Nate aka ``@ncalvanese1`` (Broad)
 - Hannes aka ``@hannes-ucsc`` (UCSC)
